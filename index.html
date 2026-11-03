@@ -580,7 +580,7 @@ function caBar(label, list, total, superN){
   return `<div class="bop" style="grid-template-columns:150px 1fr;margin:6px 0"><div class="name" style="font-size:20px">${label}<small>${total} seats up · ${superN} for ⅔</small></div><div class="bar" style="height:30px"><div class="d" style="width:${d/total*100}%"></div><div class="r" style="width:${g/total*100}%"></div><div class="maj" style="left:${superN/total*100}%"><span>⅔</span></div><div class="num d" style="font-size:18px">${d}<small>D lead</small></div><div class="num r" style="font-size:18px"><small>R lead</small>${g}</div></div></div>`;
 }
 function renderCA(){
-  const el = $('#races'); if(!CA.at) { $('#watchnote').textContent='loading'; return false; }
+  const el = $('#races'); if(!CA.at) { $('#watchnote').textContent='waiting for the first returns'; return false; }
   $('#watchnote').textContent = `CA Secretary of State · ${CA.reporting.replace(/ precincts reporting/,'').replace(/\(.*\)/,'').trim()} of precincts`;
   const g = CA.gov; const govRow = g? `<div class="race"><div class="hd"><span class="where">Governor<em>statewide</em></span><span class="in">${g.rep}% of precincts</span></div><div class="cands">${g.cands.slice(0,2).map(c=>`<div class="cand ${c.party}"><span class="nm">${esc(c.name)}</span><span class="pct">${c.pct.toFixed(1)}</span><span class="trk"><i style="width:${c.pct}%"></i></span></div>`).join('')}</div></div>` : '';
   const live = [...CA.asm.map(r=>({...r,kind:'AD'})), ...CA.sen.map(r=>({...r,kind:'SD'}))].filter(r=>r.cands.length>1 && r.cands[0].votes>0 && r.cands[0].party!==r.cands[1].party).sort((a,b)=>(a.cands[0].pct-a.cands[1].pct)-(b.cands[0].pct-b.cands[1].pct)).slice(0,3);
@@ -589,12 +589,20 @@ function renderCA(){
   return true;
 }
 function renderProps(){
-  const el = $('#races'); if(!CA.props.length) return false;
+  const el = $('#races'); if(!CA.props.length){ $('#watchnote').textContent='waiting for the first returns'; return false; }
   $('#watchnote').textContent = 'yes share · CA Secretary of State';
   const ps = [...CA.props].sort((a,b)=>Math.abs(a.yes-50)-Math.abs(b.yes-50));
   el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px">` + ps.map(p=>`<div style="border-top:2px solid var(--ink);padding:4px 0 4px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;line-height:1.1"><span style="font-size:17px;font-weight:900;white-space:nowrap">Prop ${p.n}</span><span style="font-size:21px;font-weight:900;color:${p.votes? (p.yes>=50?'var(--dem-ink)':'var(--gop-ink)'):'var(--muted)'}">${p.votes? (p.yes>=50?'Yes ':'No ')+(p.yes>=50?p.yes:p.no).toFixed(1)+'%' : '—'}</span></div><div style="font-size:13.5px;font-weight:500;color:var(--muted);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:33px;margin-top:2px" title="${esc(p.name)}">${esc(p.name.replace(/\.?\s*(Legislative|Initiative)[^.]*\.?\s*$/,'').replace(/\.$/,''))}</div><div style="height:6px;background:var(--rule);position:relative;margin-top:3px"><i style="position:absolute;left:0;top:0;bottom:0;width:${p.yes}%;background:var(--dem)"></i><b style="position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--ink)"></b></div></div>`).join('') + '</div>';
   return true;
 }
+const EMPTY = {
+  watch:'The closest contests appear here as votes come in.',
+  odds:'Polymarket odds load in a moment.',
+  closing:'Poll-closing times load with the first results feed.',
+  remaining:'Shows uncalled races once at least 10% of the expected vote is in: the leader\'s margin, votes still out, and the share the trailer needs.',
+  ca:'California returns start after polls close at 8:00 PM PT (Secretary of State feed).',
+  props:'Statewide ballot measures appear once California starts reporting.',
+};
 const PANELS = [
   {id:'watch', title:'Races to watch', render:renderWatch},
   {id:'odds', title:'Odds board', render:renderOdds},
@@ -609,7 +617,9 @@ function renderPanel(advance, dir=1){
   for (let k=0;k<PANELS.length;k++){
     if(advance){ panelIdx = (panelIdx+dir+PANELS.length)%PANELS.length; advance=false; }
     const p = PANELS[panelIdx]; $('#ptitle').textContent = p.title;
-    if(p.render()) break; panelIdx = (panelIdx+dir+PANELS.length)%PANELS.length;
+    if(p.render()) break;
+    if(!autoRotate){ $('#races').innerHTML = `<div class="empty">${EMPTY[p.id]||'Nothing to show yet.'}</div>`; if(!$('#watchnote').textContent) $('#watchnote').textContent='waiting for data'; break; }
+    panelIdx = (panelIdx+dir+PANELS.length)%PANELS.length;
   }
   const pd = $('#pdots');
   if(!pd.dataset.built){ pd.innerHTML = PANELS.map((p,i)=>`<button class="dot" data-i="${i}" aria-label="${p.title}" title="${p.title}"></button>`).join('') + `<span><em id="pnextlabel" style="font-style:normal"></em><button id="autobtn" aria-pressed="true">Auto ▸ on</button></span>`; pd.dataset.built='1';
