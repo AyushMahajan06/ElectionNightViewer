@@ -2,3 +2,6 @@ platform-tools/
 *.apk
 *.zip
 Thumbs.db
+
+.vercel
+.env*

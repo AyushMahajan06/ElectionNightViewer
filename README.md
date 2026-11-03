@@ -5,6 +5,8 @@ prediction-market odds, and a celebration every time a race is called for the De
 
 ![preview](preview.png)
 
+**Live:** https://election.ayushmahajan.com
+
 Open `index.html` in any modern browser. No build step, no server required, nothing to install.
 Everything updates on its own; there are no menus to click through, so it works on a TV across the room.
 
@@ -54,6 +56,23 @@ becomes one combined celebration. Republican calls get a quiet corner toast.
 - **On a TV with a browser:** `Serve to TV.bat` serves the folder on your LAN (`python -m http.server 8000`); open
   `http://<pc-ip>:8000/` on the TV. On Android TV you can launch it over ADB:
   `adb shell am start -a android.intent.action.VIEW -d "http://<pc-ip>:8000/"` (needs a browser app installed on the TV).
+
+## Deploying
+It's a static page, so any static host works. On Vercel:
+
+- **CLI:** `npx vercel --prod` from the folder (first run signs you in and creates the project; `vercel.json` and
+  `.vercelignore` are already set up — no build command, output is the folder itself, `index.html` is served with
+  `Cache-Control: no-cache` so edits show up immediately).
+- **From GitHub:** vercel.com/new → import this repo → framework "Other", leave build/output empty → Deploy. Every push
+  redeploys.
+
+**Custom domain (Cloudflare DNS):** in Vercel, Settings → Domains → add the subdomain. In Cloudflare, add a `CNAME`
+record for it pointing to `cname.vercel-dns.com` with proxy status **DNS only** (grey cloud) — with the orange proxy on,
+Vercel can't verify the domain or issue its certificate. The domain goes valid within a couple of minutes and Vercel
+provisions HTTPS automatically.
+
+Once hosted, a TV just needs a browser pointed at the URL (TV Bro or Chrome on Android/Google TV; Silk on Fire TV);
+the ADB scripts below are only for serving from a PC on the same network.
 
 ## Keys
 `T` random celebration · `1`–`5` a specific one · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.

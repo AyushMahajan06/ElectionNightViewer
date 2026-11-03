@@ -1,0 +1,5 @@
+*.bat
+*.png
+*.apk
+platform-tools/
+README.md
