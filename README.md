@@ -1,46 +1,68 @@
-# Election Night 2026 — TV viewer
+# Election Night Viewer
 
-One file, no build step: `index.html`. It polls the AP results feed that The New York Times publishes
-(`static01.nyt.com/elections-assets/…/results-senate|house|governor.json`) every 30 s and Polymarket's
-public API (`gamma-api.polymarket.com`) every 90 s. All times are Pacific.
+A single-file, zero-dependency election night dashboard built for a big screen: live results, a US map,
+prediction-market odds, and a celebration every time a race is called for the Democrats.
 
-## Run it
-- **On this PC / an HDMI-connected screen:** `Open on this PC (fullscreen).bat` (Chrome kiosk; Alt+F4 quits).
-- **Preview the night with fake results:** `Preview demo night.bat` (same page with `#demo` in the URL).
-- **On a TV with a browser (Android/Google TV, Fire TV Silk, LG/Samsung):** run `Serve to TV.bat`, then open
-  `http://<PC-IP>:8000/` in the TV browser and put it full screen.
-- **Android TV via ADB** (from this PC, with platform-tools installed):
-  ```
-  adb pair 192.168.8.152:41961 339735
-  adb connect 192.168.8.152:<connect-port shown on the TV's Wireless debugging screen>
-  adb shell am start -a android.intent.action.VIEW -d "http://<PC-IP>:8000/"
-  ```
-  (This needs a browser app on the TV; stock Google TV has none, so sideload Chrome or TV Bro first.)
+![preview](preview.png)
+
+Open `index.html` in any modern browser. No build step, no server required, nothing to install.
+Everything updates on its own; there are no menus to click through, so it works on a TV across the room.
+
+## Data sources
+| What | Source | Refresh |
+|---|---|---|
+| Vote counts, race calls, flips, ratings, poll-closing times | AP results as published by The New York Times (`static01.nyt.com/elections-assets/…/results-{senate,house,governor}.json`) | 30 s |
+| Win probabilities and 24-hour price history | Polymarket public APIs (`gamma-api.polymarket.com`, `clob.polymarket.com`) | 90 s |
+| California governor, Assembly, State Senate and ballot measures | California Secretary of State (`api.sos.ca.gov/returns/…`) | 2 min |
+
+All three APIs are public and CORS-enabled, so the page fetches them directly from the browser. All times are shown in Pacific time.
 
 ## What's on screen
-- Live headline (what each party still needs for the Senate; the House in the line below), Senate and House balance bars (solid = called, hatched = leading).
-- Map cycling Senate → Governors → House every 24 s. Solid = called, hatched = leading, grey = polls closed/open.
-- Right panel rotates every 20 s between (click the ‹ › arrows or the dots to switch; auto-rotation pauses 90 s after a click):
-  1. **Races to watch** — closest contests with votes in (toss-ups by poll-closing time before then)
-  2. **Odds board** — Polymarket chance of Senate/House control, then key races with live vote % next to market odds
-     (▲▼ shows the odds move since the last refresh). Texas (Talarico) and Michigan (El-Sayed) are pinned on top.
-  3. **Poll closings** — the next closing waves in PT and the marquee races in each
-  4. **Vote remaining** — for uncalled races, the leader's vote margin, the estimated votes still out, and the share of
-     what's left the trailing candidate needs to overtake
-  Panels with nothing to show yet are skipped automatically. Click the map title to switch Senate / Governors / House.
-- Latest-calls ticker, next-poll-closing countdown, clock in PT.
+- **Headline** — what each party still needs for the Senate (House on the line below), with the yellow highlighter treatment.
+- **Balance bars** — Senate and House seats: solid = called, hatched = currently leading, marker at the majority line.
+- **Map** — cycles Senate → Governors → House every 24 s (or click the title). Solid = called, hatched = leading, grey = polls closed / open.
+- **Rotating panel** (every 20 s; ‹ › arrows, the dots, or ← → keys switch it, which turns auto-rotation off; the
+  "Auto" button turns it back on):
+  1. **Races to watch** — the closest contests with votes in; toss-ups by poll-closing time before then
+  2. **Odds board** — Polymarket chance of Senate and House control with a 24-hour sparkline, then key races showing
+     live vote share beside market odds (▲▼ = move since last refresh). Texas and Michigan Senate are pinned on top.
+  3. **Poll closings** — the next closing waves and the marquee races in each
+  4. **Vote remaining** — for uncalled races: the leader's margin, the estimated votes still out, and the share of what's
+     left the trailing candidate needs
+  5. **California** — governor, Assembly and State Senate leads with the two-thirds supermajority line, and the closest
+     contested districts
+  6. **California props** — every statewide measure, sorted by how close it is
+  Panels with nothing to show yet are skipped automatically.
+- **Runoff tracking** — races with a 50% threshold (e.g. Georgia) get a "runoff likely" badge once nobody is clearing it,
+  and "RUNOFF" when one is declared.
+- **Latest calls** ticker, "next poll closing" countdown with the states closing and how many have closed so far, live clock.
+- **Dark mode** and **sound** toggles bottom-right (also `D` and `S` keys; `#dark` in the URL starts dark). Sounds are
+  synthesized in the browser — nothing to download — and stay off until you turn them on once, which also satisfies
+  browser autoplay rules. Both settings are remembered.
 
-## Fun
-Every Democratic call fires one of five animations in rotation, with confetti and a screen shake:
-bowling strike (googly-eyed ball), the state launching as a firework rocket, a donkey piñata getting whacked,
-a slot machine landing D·D·D (jackpot coins), and a boot kicking a field goal. A burst of calls at once becomes
-one combined celebration. Republican calls get a quiet corner toast.
+## The fun part
+Every Democratic call fires one of five animations in rotation, with confetti, a screen shake and (if sound is on) its
+own sound effect — rolling ball and pin crash, rocket whistle and boom, bat crack, reel ticks and jackpot chime, kick and
+ref whistle, plus a crowd cheer: a bowling strike
+(googly-eyed ball), the state itself launching as a rocket and bursting into fireworks, a donkey piñata getting whacked,
+a slot machine landing D·D·D with a jackpot coin rain, and a boot kicking a field goal. A burst of calls at once
+becomes one combined celebration. Republican calls get a quiet corner toast.
 
-## Keys (handy for testing — none needed on the TV)
-`T` random celebration · `1`–`5` a specific one · `←` `→` or `P` switch panel · `M` next map · add `#demo` to the URL for fake results.
-Calls already on screen when the page first loads don't re-trigger (remembered in the browser), so refreshing is safe.
+## Running it
+- **Full screen on a PC:** `Open on this PC (fullscreen).bat` (Chrome kiosk mode; Alt+F4 quits), or just open `index.html`.
+- **Preview the night with fake results:** `Preview demo night.bat`, or add `#demo` to the URL.
+- **On a TV with a browser:** `Serve to TV.bat` serves the folder on your LAN (`python -m http.server 8000`); open
+  `http://<pc-ip>:8000/` on the TV. On Android TV you can launch it over ADB:
+  `adb shell am start -a android.intent.action.VIEW -d "http://<pc-ip>:8000/"` (needs a browser app installed on the TV).
 
-## Data notes
-- Results and race calls are AP's, as republished by the NYT; "flip" is AP's seat-change flag.
-- Polymarket slugs follow `<state>-senate-election-winner` and `<state>-governor-winner-2026`; races without a market
-  simply don't appear on the odds board.
+## Keys
+`T` random celebration · `1`–`5` a specific one · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
+Calls already on screen when the page first loads don't re-trigger (remembered in `localStorage`), so refreshing is safe.
+
+## Notes
+- Race calls and the "flip" flag are AP's. Expected-vote totals are AP estimates and get revised during the night.
+- Polymarket market slugs follow `<state>-senate-election-winner` and `<state>-governor-winner-2026`; races without a
+  market don't appear on the odds board.
+- The map geometry is from [us-atlas](https://github.com/topojson/us-atlas) (Albers USA), simplified and inlined.
+
+MIT License.

@@ -39,6 +39,12 @@ echo Connecting to %CONN_ADDR% ...
 :connected
 "%ADB%" devices
 
+rem ---- 3b. keep the TV awake: no screensaver, no display sleep while the viewer runs ----
+"%ADB%" shell settings put secure screensaver_enabled 0
+"%ADB%" shell settings put system screen_off_timeout 2147483647
+"%ADB%" shell svc power stayon true
+echo Screensaver off, display sleep disabled on the TV.
+
 rem ---- 4. browser on the TV? install TV Bro (open source, github.com/truefedex/tv-bro) if none ----
 set "BROWSER="
 "%ADB%" shell pm list packages > "%TEMP%\adb_pkgs.txt" 2>nul
