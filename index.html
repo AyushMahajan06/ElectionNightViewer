@@ -72,7 +72,7 @@
   .bar .rl{right:0;background:var(--gop-soft)}
   .bar .maj{position:absolute;top:-8px;bottom:-8px;width:4px;background:var(--ink);left:50%;transform:translateX(-50%)}
   .bar .maj span{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:16px;font-weight:700;white-space:nowrap;margin-top:3px}
-  .bar .num{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+  .bar .num{position:absolute;top:0;height:100%;display:flex;align-items:center;line-height:1;font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15);white-space:nowrap;box-sizing:border-box}
   .bar .num.d{left:12px;background:none;width:auto}
   .bar .num.r{right:12px;background:none;width:auto}
   .bar .num small{font-size:14px;font-weight:700;margin-left:6px;opacity:.9}
@@ -362,8 +362,8 @@ function renderBop(id, c, office){
   const dn = bar.querySelector('.num.d'), rn = bar.querySelector('.num.r');
   dn.innerHTML = `${c.dem}<small>DEM</small>`; rn.innerHTML = `<small>GOP</small>${c.gop}`;
   const smallD = c.dem/total<=0.06, smallR = c.gop/total<=0.06;
-  dn.style.color = '#fff'; dn.style.left = smallD? (pct(c.dem)+0.5)+'%' : '12px'; dn.style.background = smallD? 'var(--dem)':'none'; dn.style.padding = smallD? '2px 10px':'0';
-  rn.style.color = '#fff'; rn.style.right = smallR? (pct(c.gop)+0.5)+'%' : '12px'; rn.style.background = smallR? 'var(--gop)':'none'; rn.style.padding = smallR? '2px 10px':'0';
+  dn.style.left = smallD? pct(c.dem)+'%' : '12px'; dn.style.background = smallD? 'var(--dem)':'none'; dn.style.padding = smallD? '0 12px':'0';
+  rn.style.right = smallR? pct(c.gop)+'%' : '12px'; rn.style.background = smallR? 'var(--gop)':'none'; rn.style.padding = smallR? '0 12px':'0';
   const maj = bar.querySelector('.maj'); const need = office==='S'? 50.5 : 218; maj.style.left = (need/total*100)+'%';
   maj.querySelector('span').textContent = office==='S' ? '51 · 50' : '218';
   const small = document.querySelector(`#${id} .name small`);
