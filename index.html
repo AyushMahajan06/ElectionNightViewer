@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
 <title>Election Night 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
+    color-scheme: light only;
     --paper:#F7F4EC; --ink:#151412; --muted:#7A7467; --rule:#E2DED4;
     --hl:#FFE34D;
     --dem:#2E6FE0; --dem-soft:#BBD0F5; --dem-ink:#1E4DA8;
@@ -19,7 +22,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;overflow:hidden;cursor:default}
   /* Fixed 1920x1080 stage, scaled to the screen */
-  #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;
+  #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;
     display:grid;grid-template-rows:72px 214px 1fr 86px;grid-template-columns:1fr;padding:0 56px}
   /* ---- top strip ---- */
   #top{display:flex;align-items:center;justify-content:space-between;font-size:22px;font-weight:700;border-bottom:3px solid var(--ink)}
@@ -167,7 +170,7 @@
     transition:transform .35s cubic-bezier(.2,1.6,.3,1),opacity .2s}
   #fx.strike .strike{transform:translate(-50%,-50%) scale(1) rotate(-6deg);opacity:1}
   #stage.shake{animation:shake .5s}
-  @keyframes shake{10%,90%{transform:translate(-50%,-50%) scale(var(--s)) translate(-6px,2px)}20%,80%{transform:translate(-50%,-50%) scale(var(--s)) translate(8px,-3px)}30%,50%,70%{transform:translate(-50%,-50%) scale(var(--s)) translate(-10px,4px)}40%,60%{transform:translate(-50%,-50%) scale(var(--s)) translate(10px,-4px)}}
+  @keyframes shake{10%,90%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(-6px,2px)}20%,80%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(8px,-3px)}30%,50%,70%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(-10px,4px)}40%,60%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(10px,-4px)}}
   /* toast for R calls */
   #toast{position:fixed;right:56px;bottom:120px;visibility:hidden;background:var(--ink);color:var(--paper);padding:16px 26px;font-size:26px;font-weight:900;transform:translateX(140%);transition:transform .5s cubic-bezier(.2,1.2,.3,1);z-index:40}
   #toast.on{transform:none;visibility:visible}
@@ -278,6 +281,7 @@ function normalize(){
         rating: r.rating||r.general_rating||null, status: r.race_call_status, called: !!winner, winner, gained: r.outcome?.gained||null,
         calledAt: r.outcome?.winner_accepted_at?.[0] || (winner? r.updated_at : null),
         eevp: ru.eevp||0, total, expected: ru.total_expected_vote||0, cands, prev: r.in_party_control, updated: r.updated_at,
+        threshold: r.win_threshold||null, runoff: r.race_call_status==='runoff' || (r.outcome?.advanced_to_runoff||[]).length>0,
         hist: (()=>{ const h = ru.historical_comparison_race_data||{}; const k = Object.keys(h)[0]; if(!k) return null; const m = ru.historical_comparison_race_meta?.[k]; return {label: m?.label||'2024', margin: h[k].margin}; })()
       });
     }
@@ -444,13 +448,13 @@ function renderWatch(){
     const [a,b] = [r.cands[0], r.cands[1]||{name:'',party:'O',pct:0}];
     const inTxt = r.called ? `${r.winner?.party==='D'?'Dem':r.winner?.party==='R'?'Rep':'Ind'} win${r.gained?' · FLIP':''}` : r.total>0 ? `${Math.round(r.eevp)}% in` : (polls[r.st]? `closes ${fmtPT(polls[r.st])}` : '');
     const cand = c=>`<div class="cand ${c.party}"><span class="nm${r.called&&r.winner?.id===c.id?' win':''}">${esc(c.name)}${c.inc?' <small style="font-weight:500;color:var(--muted)">inc.</small>':''}</span><span class="pct">${r.total? c.pct.toFixed(1):'—'}</span><span class="trk"><i style="width:${Math.min(100,c.pct)}%"></i></span></div>`;
-    return `<div class="race${r.called&&r.gained&&r.winner?.party==='D'?' flipD':''}"><div class="hd"><span class="where">${esc(r.label)}<em>${r.officeName}${r.special?' special':''}${r.rating?' · '+r.rating.replace('-',' ').replace('rep','R').replace('dem','D'):''}</em></span><span class="in${r.called?' called '+(r.winner?.party||''):''}">${inTxt}</span></div><div class="cands">${cand(a)}${cand(b)}</div></div>`;
+    return `<div class="race${r.called&&r.gained&&r.winner?.party==='D'?' flipD':''}"><div class="hd"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}${r.special?' special':''}${r.rating?' · '+r.rating.replace('-',' ').replace('rep','R').replace('dem','D'):''}</em></span><span class="in${r.called?' called '+(r.winner?.party||''):''}">${inTxt}</span></div><div class="cands">${cand(a)}${cand(b)}</div></div>`;
   }).join('');
   return true;
 }
 
 /* ---- Polymarket odds ---- */
-const PM = { control:{}, races:{}, at:0 };
+const PM = { control:{}, races:{}, at:0, tok:{}, hist:{} };
 const PM_PIN = ['TX','MI']; // always on top of the odds board: Talarico (TX), El-Sayed (MI)
 const PM_KEY = ['TX','MI','GA','NC','ME','IA','OH','AK','NH','NE','KS','MN','FL']; // Senate races with liquid markets, in rough order of interest
 function pmSlug(r){ const n=(NAMES[r.st]||'').toLowerCase().replace(/[^a-z]+/g,'-'); return r.office==='S'? `${n}-senate-election-winner` : r.office==='G'? `${n}-governor-winner-2026` : null; }
@@ -463,7 +467,7 @@ async function fetchPM(){
     for (let i=0;i<slugs.length;i+=20){ const r = await fetch('https://gamma-api.polymarket.com/events?'+slugs.slice(i,i+20).map(x=>'slug='+x).join('&')); if(r.ok) evs.push(...await r.json()); }
     for (const e of evs){
       const ms = (e.markets||[]).filter(m=>m.outcomePrices && !/^(Person|Party) [A-Z]$/.test(m.groupItemTitle||'')).map(m=>({t:m.groupItemTitle||m.question, p:+JSON.parse(m.outcomePrices)[0]}));
-      if(/which-party-will-win-the-(senate|house)/.test(e.slug)){ const d = ms.find(m=>/Democratic/.test(m.t)); PM.control[e.slug.includes('senate')?'S':'H'] = d? d.p : null; continue; }
+      if(/which-party-will-win-the-(senate|house)/.test(e.slug)){ const key = e.slug.includes('senate')?'S':'H'; const dm = (e.markets||[]).find(m=>/Democratic/.test(m.groupItemTitle||'')); const d = ms.find(m=>/Democratic/.test(m.t)); PM.control[key] = d? d.p : null; try{ PM.tok[key] = JSON.parse(dm.clobTokenIds)[0]; }catch(_){} continue; }
       for (const r of bySlug[e.slug]||[]){
         const pick = p => { let m = ms.find(x=>new RegExp('\\('+p+'\\)').test(x.t)); if(!m){ const c = r.cands.find(c=>c.party===p); if(c) m = ms.find(x=>x.t.toLowerCase().includes(c.name.toLowerCase())); } return m; };
         const d = pick('D'), g = pick('R'); const prev = PM.races[r.id];
@@ -471,20 +475,31 @@ async function fetchPM(){
       }
     }
     PM.at = Date.now();
+    for (const key of ['S','H']){ if(!PM.tok[key]) continue; try{ const h = await fetch(`https://clob.polymarket.com/prices-history?market=${PM.tok[key]}&interval=1d&fidelity=10`).then(r=>r.json()); if(h.history?.length) PM.hist[key] = h.history.map(x=>({t:x.t*1000,p:x.p})); }catch(e){} }
   }catch(e){ console.warn('polymarket', e); }
 }
+function spark(key){
+  const h = PM.hist[key]; if(!h || h.length<2) return '';
+  const w=230, ht=46, t0=h[0].t, t1=h[h.length-1].t; const ps=h.map(x=>x.p); let lo=Math.min(...ps), hi=Math.max(...ps); if(hi-lo<0.06){ const m=(hi+lo)/2; lo=m-0.03; hi=m+0.03; }
+  const X=x=>((x.t-t0)/Math.max(1,t1-t0)*w).toFixed(1), Y=x=>(ht-(x.p-lo)/(hi-lo)*ht).toFixed(1);
+  const d = h.map((x,i)=>(i?'L':'M')+X(x)+','+Y(x)).join('');
+  const delta = Math.round((h[h.length-1].p - h[0].p)*100);
+  return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" style="display:block;margin-top:6px;overflow:visible"><line x1="0" x2="${w}" y1="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" y2="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" stroke="rgba(247,244,236,.35)" stroke-dasharray="3 3"/><path d="${d}" fill="none" stroke="var(--hl)" stroke-width="3" stroke-linejoin="round"/><circle cx="${X(h[h.length-1])}" cy="${Y(h[h.length-1])}" r="4" fill="var(--hl)"/></svg><span style="font-size:12px;opacity:.75">24h ${delta>=0?'+':''}${delta} pts · ${Math.round(lo*100)}–${Math.round(hi*100)}%</span>`;
+}
+function runoffState(r){ if(r.runoff) return 'RUNOFF'; if(r.called||!r.threshold||r.total===0) return null; const top=r.cands[0]?.pct||0; if(r.eevp>=40 && top<r.threshold) return 'runoff likely'; return null; }
+function rbadge(r){ const x=runoffState(r); return x? ` <span style="background:var(--hl);color:var(--ink);font-size:12px;font-weight:900;padding:2px 6px;vertical-align:middle;margin-left:6px">${x}</span>` : ''; }
 function pct(p){ return p==null? '—' : (p>=0.995? '>99' : p<=0.005? '<1' : Math.round(p*100)) + '%'; }
 function renderOdds(){
   const el = $('#races'); $('#watchnote').textContent = PM.at? `Polymarket · ${fmtPT(new Date(PM.at))}` : 'Polymarket';
-  const ctl = `<div class="ctl"><div><small>Senate control · Dem chance</small><b>${pct(PM.control.S)}</b></div><div><small>House control · Dem chance</small><b>${pct(PM.control.H)}</b></div></div>`;
+  const ctl = `<div class="ctl"><div><small>Senate control · Dem chance</small><b>${pct(PM.control.S)}</b>${spark('S')}</div><div><small>House control · Dem chance</small><b>${pct(PM.control.H)}</b>${spark('H')}</div></div>`;
   const have = races.filter(r=>PM.races[r.id]?.d!=null);
   if(!have.length){ el.innerHTML = ctl + '<div class="empty">Race markets load in a moment.</div>'; return !!PM.at; }
   const score = r=>{ const o=PM.races[r.id]; const u = 1-Math.abs(o.d-0.5)*2; const pin = r.office==='S'? PM_PIN.indexOf(r.st) : -1; if(pin>=0) return -100+pin; return (r.called?2:0) + (r.office==='G'?0.25:0) - u - (PM_KEY.includes(r.st)&&r.office==='S'?0.6:0) - (r.total>0?0.3:0); };
-  const list = have.sort((a,b)=>score(a)-score(b)).slice(0,4);
+  const list = have.sort((a,b)=>score(a)-score(b)).slice(0, (PM.hist.S||PM.hist.H)? 3 : 4);
   el.innerHTML = ctl + list.map(r=>{ const o=PM.races[r.id]; const dc = r.cands.find(c=>c.party==='D'), rc = r.cands.find(c=>c.party==='R');
     const delta = o.prevD!=null? Math.round((o.d-o.prevD)*100) : 0; const arrow = delta? `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'}${Math.abs(delta)}</span>` : '';
     const status = r.called? `<b style="color:${r.winner?.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${r.winner?.party==='D'?'Dem':'Rep'} win</b>` : r.total>0? `${Math.round(r.eevp)}% in` : (polls[r.st]? `closes ${fmtPT(polls[r.st])}`:'');
-    return `<div class="row"><span class="where">${esc(r.label)}<em>${r.officeName}</em></span><span class="right">${status}</span>
+    return `<div class="row"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${status}</span>
       <div class="full odds"><span class="nm D">${esc(o.dName||dc?.name||'Dem')}</span><span class="v">${r.total&&dc? dc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.d)} ${arrow}<small>odds</small></span>
       <span class="nm R">${esc(o.rName||rc?.name||'Rep')}</span><span class="v">${r.total&&rc? rc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.r)}<small>odds</small></span>
       <span class="obar"><i style="width:${(o.d*100).toFixed(1)}%"></i><b style="left:50%"></b></span></div></div>`; }).join('');
@@ -509,10 +524,45 @@ function renderRemaining(){
   if(!rs.length) return false;
   el.innerHTML = rs.map(({r,a,b,rem,margin,share})=>{ const pctIn = r.expected? Math.round(r.total/r.expected*100) : Math.round(r.eevp); const sharePct = +(share*100).toFixed(1);
     const need = share>=1 ? `<b style="color:var(--gop-ink)">${esc(b.name)} can't catch up</b> on the expected vote` : `<b>${esc(b.name)}</b> needs <b class="${b.party}" style="color:${b.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${sharePct}%</b> of what's left`;
-    return `<div class="row"><span class="where">${esc(r.label)}<em>${r.officeName}</em></span><span class="right">${pctIn}% in · ~${rem>=1e6? (rem/1e6).toFixed(1)+'M' : Math.round(rem/1000)+'K'} left</span>
+    return `<div class="row"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${pctIn}% in · ~${rem>=1e6? (rem/1e6).toFixed(1)+'M' : Math.round(rem/1000)+'K'} left</span>
       <div class="full" style="display:flex;justify-content:space-between;align-items:baseline;font-size:18px;font-weight:500;color:var(--muted)"><span><b style="color:${a.party==='D'?'var(--dem-ink)':'var(--gop-ink)'};font-weight:900;font-size:22px">${esc(a.name)} +${(margin).toLocaleString()}</b> · ${a.pct.toFixed(1)}–${b.pct.toFixed(1)}</span></div>
       <div class="full" style="font-size:17px;font-weight:500;color:var(--muted)">${need}</div>
       <span class="obar full" style="margin-top:6px"><i style="width:${Math.min(100,sharePct)}%;background:${b.party==='D'?'var(--dem)':'var(--gop)'}"></i><b style="left:50%"></b></span></div>`; }).join('');
+  return true;
+}
+/* ---- California: Secretary of State live returns ---- */
+const CA = { gov:null, asm:[], sen:[], props:[], at:0, reporting:'' };
+const CA_API = 'https://api.sos.ca.gov/returns/';
+function caParse(j){ const m = /([\d.]+)%\s*\((\S+) of (\S+)\)/.exec(j.Reporting||''); const cands=(j.candidates||[]).map(c=>({name:c.Name, party:c.Party==='Dem'?'D':c.Party==='Rep'?'R':'O', votes:+String(c.Votes).replace(/,/g,'')||0, pct:+c.Percent||0, inc:!!c.incumbent})).sort((a,b)=>b.votes-a.votes); return {title:j.raceTitle, rep: m? +m[1] : 0, cands, time:j.ReportingTime}; }
+async function fetchCA(){
+  const get = async u=>{ try{ const r=await fetch(CA_API+u,{cache:'no-cache'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } };
+  const asmN = [...Array(80)].map((_,i)=>i+1), senN = [...Array(20)].map((_,i)=>(i+1)*2);
+  const [gov, props, ...rest] = await Promise.all([get('governor'), get('ballot-measures'), ...asmN.map(n=>get('state-assembly/district/'+n)), ...senN.map(n=>get('state-senate/district/'+n))]);
+  if(gov){ CA.gov = caParse(gov); CA.reporting = gov.Reporting||''; }
+  if(props) CA.props = (props['ballot-measures']||[]).map(x=>({n:+x.Number, name:x.Name, yes:+x.yesPercent||0, no:+x.noPercent||0, votes:(+String(x.yesVotes).replace(/,/g,'')||0)+(+String(x.noVotes).replace(/,/g,'')||0)}));
+  CA.asm = rest.slice(0,80).map((j,i)=>j? {...caParse(j), n:asmN[i]} : null).filter(Boolean);
+  CA.sen = rest.slice(80).map((j,i)=>j? {...caParse(j), n:senN[i]} : null).filter(Boolean);
+  CA.at = Date.now();
+}
+function caBar(label, list, total, superN){
+  const d = list.filter(r=>r.cands[0]?.votes>0 && r.cands[0].party==='D').length, g = list.filter(r=>r.cands[0]?.votes>0 && r.cands[0].party==='R').length;
+  const dd = list.filter(r=>r.cands.length>1 && r.cands[0].party==='D' && r.cands[1].party==='D').length;
+  return `<div class="bop" style="grid-template-columns:150px 1fr;margin:6px 0"><div class="name" style="font-size:20px">${label}<small>${total} seats up · ${superN} for ⅔</small></div><div class="bar" style="height:30px"><div class="d" style="width:${d/total*100}%"></div><div class="r" style="width:${g/total*100}%"></div><div class="maj" style="left:${superN/total*100}%"><span>⅔</span></div><div class="num d" style="font-size:18px">${d}<small>D lead</small></div><div class="num r" style="font-size:18px"><small>R lead</small>${g}</div></div></div>`;
+}
+function renderCA(){
+  const el = $('#races'); if(!CA.at) { $('#watchnote').textContent='loading'; return false; }
+  $('#watchnote').textContent = `CA Secretary of State · ${CA.reporting.replace(/ precincts reporting/,'').replace(/\(.*\)/,'').trim()} of precincts`;
+  const g = CA.gov; const govRow = g? `<div class="race"><div class="hd"><span class="where">Governor<em>statewide</em></span><span class="in">${g.rep}% of precincts</span></div><div class="cands">${g.cands.slice(0,2).map(c=>`<div class="cand ${c.party}"><span class="nm">${esc(c.name)}</span><span class="pct">${c.pct.toFixed(1)}</span><span class="trk"><i style="width:${c.pct}%"></i></span></div>`).join('')}</div></div>` : '';
+  const live = [...CA.asm.map(r=>({...r,kind:'AD'})), ...CA.sen.map(r=>({...r,kind:'SD'}))].filter(r=>r.cands.length>1 && r.cands[0].votes>0 && r.cands[0].party!==r.cands[1].party).sort((a,b)=>(a.cands[0].pct-a.cands[1].pct)-(b.cands[0].pct-b.cands[1].pct)).slice(0,3);
+  const rows = live.map(r=>`<div class="race"><div class="hd"><span class="where">${r.kind}-${r.n}<em>${r.kind==='AD'?'Assembly':'State Senate'}</em></span><span class="in">${r.rep}% in</span></div><div class="cands">${r.cands.slice(0,2).map(c=>`<div class="cand ${c.party}"><span class="nm">${esc(c.name)}${c.inc?' <small style="font-weight:500;color:var(--muted)">inc.</small>':''}</span><span class="pct">${c.pct.toFixed(1)}</span><span class="trk"><i style="width:${c.pct}%"></i></span></div>`).join('')}</div></div>`).join('');
+  el.innerHTML = govRow + caBar('Assembly', CA.asm, 80, 54) + caBar('State Senate', CA.sen, 20, 14) + (rows || '<div class="empty">Closest contested legislative districts appear here once precincts report (polls close 8:00 PM).</div>');
+  return true;
+}
+function renderProps(){
+  const el = $('#races'); if(!CA.props.length) return false;
+  $('#watchnote').textContent = 'yes share · CA Secretary of State';
+  const ps = [...CA.props].sort((a,b)=>Math.abs(a.yes-50)-Math.abs(b.yes-50));
+  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px">` + ps.map(p=>`<div style="border-top:2px solid var(--ink);padding:6px 0 5px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:17px;font-weight:900;white-space:nowrap">Prop ${p.n}</span><span style="font-size:22px;font-weight:900;color:${p.votes? (p.yes>=50?'var(--dem-ink)':'var(--gop-ink)'):'var(--muted)'}">${p.votes? (p.yes>=50?'Yes ':'No ')+(p.yes>=50?p.yes:p.no).toFixed(1)+'%' : '—'}</span></div><div style="font-size:13px;font-weight:500;color:var(--muted);line-height:1.25;height:32px;overflow:hidden">${esc(p.name.replace(/\. (Legislative|Initiative).*$/,''))}</div><div style="height:7px;background:var(--rule);position:relative;margin-top:4px"><i style="position:absolute;left:0;top:0;bottom:0;width:${p.yes}%;background:var(--dem)"></i><b style="position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--ink)"></b></div></div>`).join('') + '</div>';
   return true;
 }
 const PANELS = [
@@ -520,6 +570,8 @@ const PANELS = [
   {id:'odds', title:'Odds board', render:renderOdds},
   {id:'closing', title:'Poll closings', render:renderClosing},
   {id:'remaining', title:'Vote remaining', render:renderRemaining},
+  {id:'ca', title:'California', render:renderCA},
+  {id:'props', title:'California props', render:renderProps},
 ];
 let panelIdx = 0, panelHold = 0;
 const PANEL_MS = 20000;
@@ -724,8 +776,11 @@ async function tick(){
   renderClock();
 }
 
-function fit(){ const s = Math.min(innerWidth/1920, innerHeight/1080); const st=$('#stage'); st.style.setProperty('--s', s); st.style.transform = `translate(-50%,-50%) scale(${s})`; }
-addEventListener('resize', fit); fit();
+function fit(){ const vv = window.visualViewport; const W = vv? vv.width : innerWidth, H = vv? vv.height : innerHeight; const s = Math.min(W/1920, H/1080); const x = Math.round((W-1920*s)/2), y = Math.round((H-1080*s)/2); const st=$('#stage'); st.style.setProperty('--s', s); st.style.setProperty('--x', x+'px'); st.style.setProperty('--y', y+'px'); st.style.transform = `translate(${x}px,${y}px) scale(${s})`; }
+if(window.visualViewport) visualViewport.addEventListener('resize', fit);
+addEventListener('resize', fit); addEventListener('load', fit); setTimeout(fit, 500); setTimeout(fit, 2000); fit();
+if(location.search.includes('debug')){ const d=document.createElement('pre'); d.style.cssText='position:fixed;left:0;top:0;z-index:999;background:#000;color:#0f0;font:16px monospace;padding:8px;margin:0;white-space:pre-wrap;max-width:900px'; document.body.appendChild(d);
+  setInterval(()=>{ const st=$('#stage'); const r=st.getBoundingClientRect(); d.textContent=[`UA ${navigator.userAgent}`,`inner ${innerWidth}x${innerHeight} client ${document.documentElement.clientWidth}x${document.documentElement.clientHeight} dpr ${devicePixelRatio} screen ${screen.width}x${screen.height}`,`vv ${visualViewport?visualViewport.width+'x'+visualViewport.height+' scale '+visualViewport.scale:'-'}`,`style.transform "${st.style.transform}"`,`computed transform ${getComputedStyle(st).transform} pos ${getComputedStyle(st).position} left ${getComputedStyle(st).left} top ${getComputedStyle(st).top}`,`rect ${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)}`].join('\n'); }, 1000); }
 buildMap();
 setInterval(renderClock, 1000);
 setInterval(()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }, MAP_CYCLE_MS);
@@ -735,6 +790,7 @@ $('#pnext').onclick = ()=>manual(()=>renderPanel(true,1));
 $('#pprev').onclick = ()=>manual(()=>renderPanel(true,-1));
 $('#pdots').onclick = e=>{ const i=e.target.dataset?.i; if(i!=null) manual(()=>{ panelIdx=+i; renderPanel(false); }); };
 $('#maphead .title').onclick = ()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); };
+setTimeout(async function caLoop(){ await fetchCA(); if(['ca','props'].includes(PANELS[panelIdx].id)) renderPanel(false); setTimeout(caLoop, 120000); }, 6000);
 setTimeout(async function pmLoop(){ if(races.length){ await fetchPM(); if(PANELS[panelIdx].id==='odds') renderPanel(false); } setTimeout(pmLoop, 90000); }, 4000);
 tick(); setInterval(tick, POLL_MS);
 addEventListener('keydown', e=>{
@@ -747,6 +803,8 @@ addEventListener('keydown', e=>{
 let demoStep = 0;
 function demoMutate(){
   demoStep++;
+  if(CA.at){ const fake=(r,i)=>{ const p=Math.min(99,demoStep*15+(i%7)*3); r.rep=p; const a=45+((i*37)%12); if(r.cands[0]){ r.cands[0].pct=a; r.cands[0].votes=Math.round(a*p*30);} if(r.cands[1]){ r.cands[1].pct=100-a-2; r.cands[1].votes=Math.round((98-a)*p*30);} r.cands.sort((x,y)=>y.votes-x.votes); };
+    CA.asm.forEach(fake); CA.sen.forEach(fake); if(CA.gov) fake(CA.gov,3); CA.props.forEach((p,i)=>{ p.yes=35+((i*23)%30); p.no=100-p.yes; p.votes=1e6; }); CA.reporting=`${Math.min(99,demoStep*15)}% (x of y) precincts reporting`; }
   const rnd = (seed)=>{ let x=Math.sin(seed*9301+49297)*233280; return x-Math.floor(x); };
   for (const office of ['S','G','H']){ const j=data[office]; if(!j) continue;
     j.races.forEach((r,i)=>{ const ru=r.top_reporting_unit; if(!ru||!ru.candidates?.length) return; const seed=i+office.charCodeAt(0)*7;

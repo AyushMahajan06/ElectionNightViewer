@@ -58,11 +58,20 @@ if not defined PC_IP for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /c:
 if not defined PC_IP for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /c:"IPv4"') do if not defined PC_IP set "PC_IP=%%a"
 set "PC_IP=%PC_IP: =%"
 echo.
-echo Using %PC_IP% for the server. To use another address run:   "Connect TV.bat" 172.16.0.2
+echo LAN address for the server: %PC_IP%   ^(default: ADB tunnel; "Connect TV.bat" lan  or  "Connect TV.bat" 172.16.0.2  to use a LAN/VPN address^)
 tasklist /fi "WINDOWTITLE eq Election Night server*" | findstr /i "cmd.exe" >nul || start "Election Night server" /min cmd /c "python -m http.server 8000 || py -m http.server 8000"
 echo.
-echo Opening http://%PC_IP%:8000/index.html on the TV ...
-"%ADB%" shell am start -a android.intent.action.VIEW -d "http://%PC_IP%:8000/index.html"
+rem Tunnel the TV's port 8000 to this PC over the ADB connection, so the TV loads the page from its own localhost
+rem (works even when the firewall or a VPN blocks direct LAN access). Pass "lan" as the argument to use the LAN address instead.
+set "URL=http://127.0.0.1:8000/index.html"
+if /i "%~1"=="lan" set "URL=http://%PC_IP%:8000/index.html"
+if /i not "%~1"=="" if /i not "%~1"=="lan" set "URL=http://%PC_IP%:8000/index.html"
+"%ADB%" reverse tcp:8000 tcp:8000 >nul 2>nul && echo ADB tunnel: TV localhost:8000 -^> this PC:8000
+timeout /t 2 >nul
+powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/index.html -TimeoutSec 5).StatusCode } catch { 'Local server NOT responding: ' + $_.Exception.Message }"
+echo Opening %URL% on the TV ...
+"%ADB%" shell am force-stop com.phlox.tvwebbrowser >nul 2>nul
+"%ADB%" shell am start -a android.intent.action.VIEW -d "%URL%"
 echo.
 echo Done. If the TV asks which app to open with, pick TV Bro and choose Always.
 pause
