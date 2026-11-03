@@ -12,7 +12,7 @@
 <style>
   :root{
     color-scheme: light only;
-    --paper:#F7F4EC; --ink:#151412; --muted:#7A7467; --rule:#E2DED4; --card:#151412; --card-ink:#F7F4EC;
+    --paper:#F7F4EC; --ink:#151412; --muted:#7A7467; --rule:#E2DED4; --card:#4A4741; --card-ink:#F7F4EC; --spark:#FFE34D;
     --hl:#FFE34D;
     --dem:#2E6FE0; --dem-soft:#BBD0F5; --dem-ink:#1E4DA8;
     --gop:#F0562A; --gop-soft:#F8C7B5; --gop-ink:#B83A15;
@@ -21,16 +21,16 @@
   }
   :root[data-theme="dark"]{
     color-scheme: dark only;
-    --paper:#131210; --ink:#F3EFE6; --muted:#A39D91; --rule:#2B2925; --card:#F3EFE6; --card-ink:#131210;
-    --dem:#4A86F0; --dem-soft:#2B4374; --dem-ink:#7FAAF6;
-    --gop:#F4683F; --gop-soft:#6E3524; --gop-ink:#F9926F;
+    --paper:#131210; --ink:#F3EFE6; --muted:#A39D91; --rule:#2B2925; --card:#26241F; --card-ink:#F3EFE6; --spark:#8FB4FF;
+    --dem:#4A86F0; --dem-soft:#2E4E8E; --dem-ink:#7FAAF6;
+    --gop:#F4683F; --gop-soft:#9A3F27; --gop-ink:#F9926F;
     --oth:#9A978F; --oth-soft:#3B3A36;
     --map-open:#262420; --map-closed:#36332D; --map-none:#1C1B18;
   }
   :root[data-theme="dark"] #map text.on{fill:#fff}
   :root[data-theme="dark"] .bar .num{text-shadow:none}
   :root[data-theme="dark"] #headline mark,:root[data-theme="dark"] #fx .strike{color:#151412}
-  :root[data-theme="dark"] #top .live{background:#F3EFE6;color:#131210}
+  
   :root[data-theme="dark"] .call .flip,:root[data-theme="dark"] #fx .card .flip{color:#151412}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;overflow:hidden;cursor:default}
@@ -40,7 +40,7 @@
   /* ---- top strip ---- */
   #top{display:flex;align-items:center;justify-content:space-between;font-size:22px;font-weight:700;border-bottom:3px solid var(--ink)}
   #top .brand{display:flex;align-items:center;gap:14px;flex:none;white-space:nowrap}
-  #top .live{display:inline-flex;align-items:center;gap:8px;background:var(--card);color:var(--card-ink);padding:4px 12px;font-size:16px;letter-spacing:.02em}
+  #top .live{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);padding:4px 12px;font-size:16px;letter-spacing:.02em}
   #top .live i{width:10px;height:10px;border-radius:50%;background:#FF3B3B;animation:blink 1.4s infinite}
   @keyframes blink{50%{opacity:.25}}
   #top .right{display:flex;gap:40px;align-items:baseline}
@@ -62,14 +62,14 @@
   .bops{display:flex;flex-direction:column;gap:26px}
   .bop{display:grid;grid-template-columns:170px 1fr;align-items:center;gap:18px}
   .bop .name{font-size:26px;font-weight:900}
-  .bop .name small{display:block;font-size:15px;font-weight:500;color:var(--muted);margin-top:2px;line-height:1.25;max-width:160px}
+  .bop .name small{display:block;font-size:14px;font-weight:500;color:var(--muted);margin-top:2px;line-height:1.25;max-width:175px}
   .bar{position:relative;height:42px;background:var(--rule)}
   .bar .d,.bar .r{position:absolute;top:0;bottom:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
   .bar .d{left:0;background:var(--dem)}
   .bar .r{right:0;background:var(--gop)}
   .bar .dl,.bar .rl{position:absolute;top:0;bottom:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
-  .bar .dl{background:repeating-linear-gradient(135deg, var(--dem) 0 4px, var(--dem-soft) 4px 10px)}
-  .bar .rl{right:0;background:repeating-linear-gradient(135deg, var(--gop) 0 4px, var(--gop-soft) 4px 10px)}
+  .bar .dl{background:var(--dem-soft)}
+  .bar .rl{right:0;background:var(--gop-soft)}
   .bar .maj{position:absolute;top:-8px;bottom:-8px;width:4px;background:var(--ink);left:50%;transform:translateX(-50%)}
   .bar .maj span{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:16px;font-weight:700;white-space:nowrap;margin-top:3px}
   .bar .num{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15)}
@@ -81,7 +81,7 @@
   #mapwrap{position:relative;display:flex;flex-direction:column;min-height:0}
   #maphead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
   #maphead .title{font-size:30px;font-weight:900;letter-spacing:-.01em;display:flex;align-items:center;gap:14px}
-  #maphead .title .pill{font-size:15px;font-weight:700;background:var(--card);color:var(--card-ink);padding:5px 10px;letter-spacing:.02em}
+  #maphead .title .pill{font-size:15px;font-weight:700;background:var(--ink);color:var(--paper);padding:5px 10px;letter-spacing:.02em}
   #maphead .legend{display:flex;gap:18px;font-size:17px;font-weight:500;color:var(--muted)}
   .legend i{display:inline-block;width:18px;height:18px;vertical-align:-3px;margin-right:7px}
   .legend .lead.D{background:repeating-linear-gradient(135deg, var(--dem) 0 3px, var(--dem-soft) 3px 7px)} .legend .lead.R{background:repeating-linear-gradient(135deg, var(--gop) 0 3px, var(--gop-soft) 3px 7px)}
@@ -96,8 +96,11 @@
   #mapfoot .dem{color:var(--dem-ink)} #mapfoot .gop{color:var(--gop-ink)}
   /* races to watch */
   #watch{display:flex;flex-direction:column;min-height:0}
-  #watch h2{font-size:30px;font-weight:900;letter-spacing:-.01em;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-  #watch h2 span{font-size:16px;font-weight:500;color:var(--muted)}
+  #watch h2{font-size:30px;font-weight:900;letter-spacing:-.01em;margin-bottom:8px;display:flex;align-items:center;gap:10px;min-height:56px}
+  #watch h2 .ttl{display:flex;flex-direction:column;min-width:0;flex:1}
+  #watch h2 .ttl #ptitle{font-size:30px;font-weight:900;line-height:1.1}
+  #watch h2 .note{font-size:16px;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #watch h2 .note::before{content:"";display:inline-block;width:18px;height:3px;background:var(--hl);vertical-align:middle;margin-right:8px}
   #races{display:flex;flex-direction:column;gap:9px;overflow:hidden}
   .race{border-top:2px solid var(--ink);padding:7px 0 4px;display:grid;grid-template-columns:1fr;gap:4px}
   .race .hd{display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:700}
@@ -119,7 +122,6 @@
   .empty{font-size:20px;font-weight:500;color:var(--muted);line-height:1.5;padding-top:10px}
 
   /* panels */
-  #watch h2 span.note{font-size:16px;font-weight:500;color:var(--muted)}
   #pdots{display:flex;gap:8px;margin-top:auto;padding-top:10px;align-items:center}
   #pdots i{width:34px;height:12px;background:linear-gradient(var(--rule),var(--rule)) center/100% 5px no-repeat;cursor:pointer} #pdots i.on{background-image:linear-gradient(var(--ink),var(--ink))}
   #pdots i:hover{background-image:linear-gradient(var(--muted),var(--muted))}
@@ -130,8 +132,7 @@
   #pdots span{margin-left:auto;font-size:16px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:10px}
   #pdots button{all:unset;cursor:pointer;font-size:13px;font-weight:700;border:2px solid var(--ink);padding:3px 9px;color:var(--ink)}
   #pdots button:hover,#pdots button.on{background:var(--ink);color:var(--paper)}
-  #watch h2 .arrows{margin-left:auto;margin-right:14px}
-  #watch h2 .note{flex:none;max-width:280px;text-align:right}
+  #watch h2 .arrows{margin-left:auto;flex:none}
   .row{border-top:2px solid var(--ink);padding:9px 0 7px;display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:baseline}
   .row .where{font-size:20px;font-weight:900}
   .row .where em{font-style:normal;font-weight:500;color:var(--muted);margin-left:8px;font-size:16px}
@@ -147,7 +148,7 @@
   .obar i{position:absolute;left:0;top:0;bottom:0;background:var(--dem);transition:width .8s}
   .obar b{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--ink);transform:translateX(-50%)}
   .ctl{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
-  .ctl div{background:var(--card);color:var(--card-ink);padding:12px 16px}
+  .ctl div{background:var(--card);color:var(--card-ink);padding:12px 16px;border:1px solid var(--rule)}
   .ctl div small{display:block;font-size:14px;font-weight:500;opacity:.75}
   .ctl div b{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums}
   .ctl.three{grid-template-columns:1fr 1fr 1fr;gap:10px} .ctl.three div{padding:10px 12px} .ctl.three div b{font-size:30px}
@@ -179,7 +180,7 @@
   #fx{position:fixed;inset:0;pointer-events:none;z-index:50;display:none}
   #fx.on{display:block}
   #fx canvas{position:absolute;inset:0;width:100%;height:100%}
-  #fx .card{position:absolute;left:50%;bottom:9%;transform:translate(-50%,160%);background:var(--card);color:var(--card-ink);padding:calc(22px*var(--s,1)) calc(40px*var(--s,1));font-size:calc(40px*var(--s,1));font-weight:900;letter-spacing:-.01em;white-space:nowrap;transition:transform .5s cubic-bezier(.2,1.4,.3,1)}
+  #fx .card{position:absolute;left:50%;bottom:9%;transform:translate(-50%,160%);background:var(--ink);color:var(--paper);padding:calc(22px*var(--s,1)) calc(40px*var(--s,1));font-size:calc(40px*var(--s,1));font-weight:900;letter-spacing:-.01em;white-space:nowrap;transition:transform .5s cubic-bezier(.2,1.4,.3,1)}
   #fx .card small{display:block;font-size:calc(20px*var(--s,1));font-weight:500;opacity:.8;margin-top:4px}
   #fx.show .card{transform:translate(-50%,0)}
   #fx .card .flip{background:var(--hl);color:#151412;font-size:calc(20px*var(--s,1));padding:4px 10px;margin-left:14px;vertical-align:middle}
@@ -190,7 +191,7 @@
   #stage.shake{animation:shake .5s}
   @keyframes shake{10%,90%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(-6px,2px)}20%,80%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(8px,-3px)}30%,50%,70%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(-10px,4px)}40%,60%{transform:translate(var(--x),var(--y)) scale(var(--s)) translate(10px,-4px)}}
   /* toast for R calls */
-  #toast{position:fixed;left:calc(56px*var(--s,1));bottom:calc(120px*var(--s,1));visibility:hidden;background:var(--card);color:var(--card-ink);padding:calc(16px*var(--s,1)) calc(26px*var(--s,1));font-size:calc(26px*var(--s,1));max-width:calc(900px*var(--s,1));font-weight:900;transform:translateX(-140%);transition:transform .5s cubic-bezier(.2,1.2,.3,1);z-index:40}
+  #toast{position:fixed;left:calc(56px*var(--s,1));bottom:calc(120px*var(--s,1));visibility:hidden;background:var(--ink);color:var(--paper);padding:calc(16px*var(--s,1)) calc(26px*var(--s,1));font-size:calc(26px*var(--s,1));max-width:calc(900px*var(--s,1));font-weight:900;transform:translateX(-140%);transition:transform .5s cubic-bezier(.2,1.2,.3,1);z-index:40}
   #toast.on{transform:none;visibility:visible}
   #toast small{display:block;font-size:calc(16px*var(--s,1));font-weight:500;opacity:.8;margin-top:2px}
   #toast .tag{display:inline-block;color:#fff;background:var(--gop);font-size:calc(15px*var(--s,1));padding:3px 8px;margin-right:12px;vertical-align:middle}
@@ -230,7 +231,7 @@
       <div id="mapfoot"></div>
     </div>
     <div id="watch">
-      <h2><span id="ptitle">Races to watch</span><span class="arrows"><button id="pprev" title="Previous panel" aria-label="Previous panel">‹</button><button id="pnext" title="Next panel" aria-label="Next panel">›</button></span><span class="note" id="watchnote"></span></h2>
+      <h2><div class="ttl"><span id="ptitle">Races to watch</span><span class="note" id="watchnote"></span></div><span class="arrows"><button id="pprev" type="button" title="Previous panel" aria-label="Previous panel">‹</button><button id="pnext" type="button" title="Next panel" aria-label="Next panel">›</button></span></h2>
       <div id="races"><div class="empty">The closest contests appear here as votes come in.</div></div>
       <div id="pdots"></div>
     </div>
@@ -512,7 +513,7 @@ function spark(key){
   const d = h.map((x,i)=>(i?'L':'M')+X(x)+','+Y(x)).join('');
   const delta = Math.round((h[h.length-1].p - h[0].p)*100);
   const mid = (lo<=0.5 && hi>=0.5) ? `<line x1="0" x2="${w}" y1="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" y2="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/>` : '';
-  return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" style="display:block;margin-top:6px">${mid}<path d="${d}" fill="none" stroke="var(--hl)" stroke-width="3" stroke-linejoin="round"/><circle cx="${X(h[h.length-1])}" cy="${Y(h[h.length-1])}" r="4" fill="var(--hl)"/></svg><span style="font-size:13px;opacity:.8">24h ${delta>=0?'+':''}${delta} pts · ${Math.round(lo*100)}–${Math.round(hi*100)}%</span>`;
+  return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" style="display:block;margin-top:6px">${mid}<path d="${d}" fill="none" stroke="var(--spark)" stroke-width="3" stroke-linejoin="round"/><circle cx="${X(h[h.length-1])}" cy="${Y(h[h.length-1])}" r="4" fill="var(--spark)"/></svg><span style="font-size:13px;opacity:.8">24h ${delta>=0?'+':''}${delta} pts · ${Math.round(lo*100)}–${Math.round(hi*100)}%</span>`;
 }
 function runoffState(r){ if(r.runoff) return 'RUNOFF'; if(r.called||!r.threshold||r.total===0) return null; const top=r.cands[0]?.pct||0; if(r.eevp>=40 && top<r.threshold) return 'runoff likely'; return null; }
 function rbadge(r){ const x=runoffState(r); return x? ` <span style="background:var(--hl);color:#151412;font-size:13px;font-weight:900;padding:2px 6px;vertical-align:middle;margin-left:6px">${x}</span>` : ''; }
