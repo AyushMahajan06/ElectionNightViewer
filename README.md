@@ -18,16 +18,16 @@ public API (`gamma-api.polymarket.com`) every 90 s. All times are Pacific.
   (This needs a browser app on the TV; stock Google TV has none, so sideload Chrome or TV Bro first.)
 
 ## What's on screen
-- Live headline (what each party still needs), Senate and House balance bars (solid = called, hatched = leading).
+- Live headline (what each party still needs for the Senate; the House in the line below), Senate and House balance bars (solid = called, hatched = leading).
 - Map cycling Senate → Governors → House every 24 s. Solid = called, hatched = leading, grey = polls closed/open.
-- Right panel rotates every 20 s between:
+- Right panel rotates every 20 s between (click the ‹ › arrows or the dots to switch; auto-rotation pauses 90 s after a click):
   1. **Races to watch** — closest contests with votes in (toss-ups by poll-closing time before then)
-  2. **Odds board** — Polymarket chance of Senate/House control, plus key races with live vote % next to market odds
-     (▲▼ shows the odds move since the last refresh)
+  2. **Odds board** — Polymarket chance of Senate/House control, then key races with live vote % next to market odds
+     (▲▼ shows the odds move since the last refresh). Texas (Talarico) and Michigan (El-Sayed) are pinned on top.
   3. **Poll closings** — the next closing waves in PT and the marquee races in each
-  4. **Flips & upsets** — seats that changed hands, and winners who beat their pre-election rating
-  5. **Swing vs. 2024** — current margin compared with the 2024 presidential margin in that state
-  Panels with nothing to show yet are skipped automatically.
+  4. **Vote remaining** — for uncalled races, the leader's vote margin, the estimated votes still out, and the share of
+     what's left the trailing candidate needs to overtake
+  Panels with nothing to show yet are skipped automatically. Click the map title to switch Senate / Governors / House.
 - Latest-calls ticker, next-poll-closing countdown, clock in PT.
 
 ## Fun
@@ -37,7 +37,7 @@ a slot machine landing D·D·D (jackpot coins), and a boot kicking a field goal.
 one combined celebration. Republican calls get a quiet corner toast.
 
 ## Keys (handy for testing — none needed on the TV)
-`T` random celebration · `1`–`5` a specific one · `P` next panel · `M` next map · add `#demo` to the URL for fake results.
+`T` random celebration · `1`–`5` a specific one · `←` `→` or `P` switch panel · `M` next map · add `#demo` to the URL for fake results.
 Calls already on screen when the page first loads don't re-trigger (remembered in the browser), so refreshing is safe.
 
 ## Data notes

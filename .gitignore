@@ -1,0 +1,4 @@
+platform-tools/
+*.apk
+*.zip
+Thumbs.db

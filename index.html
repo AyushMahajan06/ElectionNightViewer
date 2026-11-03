@@ -17,7 +17,7 @@
     --map-open:#E6E2D9; --map-closed:#CFCABE; --map-none:#EFECE4;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;overflow:hidden;cursor:none}
+  html,body{height:100%;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;overflow:hidden;cursor:default}
   /* Fixed 1920x1080 stage, scaled to the screen */
   #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;
     display:grid;grid-template-rows:72px 214px 1fr 86px;grid-template-columns:1fr;padding:0 56px}
@@ -105,7 +105,12 @@
   /* panels */
   #watch h2 span.note{font-size:16px;font-weight:500;color:var(--muted)}
   #pdots{display:flex;gap:8px;margin-top:auto;padding-top:10px;align-items:center}
-  #pdots i{width:34px;height:5px;background:var(--rule)} #pdots i.on{background:var(--ink)}
+  #pdots i{width:34px;height:12px;background:linear-gradient(var(--rule),var(--rule)) center/100% 5px no-repeat;cursor:pointer} #pdots i.on{background-image:linear-gradient(var(--ink),var(--ink))}
+  #pdots i:hover{background-image:linear-gradient(var(--muted),var(--muted))}
+  .arrows{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle}
+  .arrows button{all:unset;cursor:pointer;width:34px;height:34px;display:inline-grid;place-items:center;border:2px solid var(--ink);font-size:20px;font-weight:900;line-height:1}
+  .arrows button:hover{background:var(--ink);color:var(--paper)}
+  #maptitle,#mapsub{cursor:pointer}
   #pdots span{margin-left:auto;font-size:14px;font-weight:500;color:var(--muted)}
   .row{border-top:2px solid var(--ink);padding:9px 0 7px;display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:baseline}
   .row .where{font-size:20px;font-weight:900}
@@ -198,7 +203,7 @@
       <div id="mapfoot"></div>
     </div>
     <div id="watch">
-      <h2><span id="ptitle">Races to watch</span><span class="note" id="watchnote"></span></h2>
+      <h2><span><span id="ptitle">Races to watch</span><span class="arrows"><button id="pprev" title="Previous panel">‹</button><button id="pnext" title="Next panel">›</button></span></span><span class="note" id="watchnote"></span></h2>
       <div id="races"><div class="empty">The closest contests appear here as votes come in.</div></div>
       <div id="pdots"></div>
     </div>
@@ -324,8 +329,8 @@ function renderBop(id, c, office){
   bar.querySelector('.rl').style.width = pct(lead.R)+'%';  bar.querySelector('.rl').style.right = pct(c.gop)+'%';
   const dn = bar.querySelector('.num.d'), rn = bar.querySelector('.num.r');
   dn.innerHTML = `${c.dem}<small>DEM</small>`; rn.innerHTML = `<small>GOP</small>${c.gop}`;
-  dn.style.color = c.dem/total>0.06? '#fff':'var(--dem-ink)'; if(c.dem/total<=0.06){ dn.style.left=(pct(c.dem+lead.D)+1)+'%'; } else dn.style.left='12px';
-  rn.style.color = c.gop/total>0.06? '#fff':'var(--gop-ink)'; if(c.gop/total<=0.06){ rn.style.right=(pct(c.gop+lead.R)+1)+'%'; } else rn.style.right='12px';
+  dn.style.color = c.dem/total>0.06? '#fff':'var(--dem-ink)'; if(c.dem/total<=0.06){ dn.style.left=(pct(c.dem)+1)+'%'; } else dn.style.left='12px';
+  rn.style.color = c.gop/total>0.06? '#fff':'var(--gop-ink)'; if(c.gop/total<=0.06){ rn.style.right=(pct(c.gop)+1)+'%'; } else rn.style.right='12px';
   const maj = bar.querySelector('.maj'); const need = office==='S'? 50.5 : 218; maj.style.left = (need/total*100)+'%';
   maj.querySelector('span').textContent = office==='S' ? '51 · 50' : '218';
   const small = document.querySelector(`#${id} .name small`);
@@ -341,18 +346,18 @@ function headline(){
   const flipsD = races.filter(r=>r.called && r.winner?.party==='D' && r.gained).length;
   const flipsR = races.filter(r=>r.called && r.winner?.party==='R' && r.gained).length;
   let h, s;
+  const dNeedS = 51-S.dem, rNeedS = 50-S.gop;
   if(H.winner && S.winner){
-    h = H.winner===S.winner ? `${H.winner==='D'?'Democrats':'Republicans'} win <mark>both chambers</mark>` : `A <mark>split Congress</mark>: ${H.winner==='D'?'Dems':'Reps'} take the House, ${S.winner==='D'?'Dems':'Reps'} hold the Senate`;
-  } else if(H.winner){
-    h = `${H.winner==='D'?'Democrats':'Republicans'} <mark>win the House</mark>`;
+    h = H.winner===S.winner ? `${H.winner==='D'?'Democrats':'Republicans'} win <mark>both chambers</mark>` : `A <mark>split Congress</mark>: ${S.winner==='D'?'Dems':'Reps'} take the Senate, ${H.winner==='D'?'Dems':'Reps'} the House`;
+  } else if(S.winner){
+    h = `${S.winner==='D'?'Democrats':'Republicans'} <mark>win the Senate</mark>`;
   } else if(!anyVotes){
-    h = `Democrats need <mark>+${Math.max(0,218-(H.cur.DEM||0))}</mark> in the House`;
+    h = `Democrats need <mark>+${Math.max(0,51-(S.cur.DEM||0)-(S.cur.OTH||0))}</mark> for the Senate`;
   } else {
-    const dNeed = 218-H.dem; const rNeed = 218-H.gop;
-    h = dNeed<=rNeed ? `Democrats need <mark>${dNeed} more</mark> for the House` : `Republicans need <mark>${rNeed} more</mark> to keep the House`;
+    h = dNeedS<=rNeedS ? `Democrats need <mark>${dNeedS} more</mark> for the Senate` : `Republicans need <mark>${rNeedS} more</mark> to keep the Senate`;
   }
-  if(S.winner) s = `<b>${S.winner==='D'?'Democrats':'Republicans'} control the Senate.</b> `;
-  else { const dNeed = 51-S.dem, rNeed = 50-S.gop; s = `Senate: D need <b>${dNeed}</b> more, R need <b>${rNeed}</b> · `; }
+  if(H.winner) s = `<b>${H.winner==='D'?'Democrats':'Republicans'} win the House.</b> `;
+  else { const dNeed = 218-H.dem, rNeed = 218-H.gop; s = `House: D need <b>${dNeed}</b> more, R need <b>${rNeed}</b> · `; }
   const called = races.filter(r=>r.called).length;
   s += called ? `<b>${called}</b> races called` : 'No races called yet';
   if(flipsD||flipsR) s += ` · flips <b style="color:var(--dem-ink)">D +${flipsD}</b>, <b style="color:var(--gop-ink)">R +${flipsR}</b>`;
@@ -446,7 +451,8 @@ function renderWatch(){
 
 /* ---- Polymarket odds ---- */
 const PM = { control:{}, races:{}, at:0 };
-const PM_KEY = ['TX','GA','NC','ME','MI','IA','OH','AK','NH','NE','KS','MN','FL']; // Senate races with liquid markets, in rough order of interest
+const PM_PIN = ['TX','MI']; // always on top of the odds board: Talarico (TX), El-Sayed (MI)
+const PM_KEY = ['TX','MI','GA','NC','ME','IA','OH','AK','NH','NE','KS','MN','FL']; // Senate races with liquid markets, in rough order of interest
 function pmSlug(r){ const n=(NAMES[r.st]||'').toLowerCase().replace(/[^a-z]+/g,'-'); return r.office==='S'? `${n}-senate-election-winner` : r.office==='G'? `${n}-governor-winner-2026` : null; }
 async function fetchPM(){
   try{
@@ -473,7 +479,7 @@ function renderOdds(){
   const ctl = `<div class="ctl"><div><small>Senate control · Dem chance</small><b>${pct(PM.control.S)}</b></div><div><small>House control · Dem chance</small><b>${pct(PM.control.H)}</b></div></div>`;
   const have = races.filter(r=>PM.races[r.id]?.d!=null);
   if(!have.length){ el.innerHTML = ctl + '<div class="empty">Race markets load in a moment.</div>'; return !!PM.at; }
-  const score = r=>{ const o=PM.races[r.id]; const u = 1-Math.abs(o.d-0.5)*2; return (r.called?2:0) + (r.office==='G'?0.25:0) - u - (PM_KEY.includes(r.st)&&r.office==='S'?0.6:0) - (r.total>0?0.3:0); };
+  const score = r=>{ const o=PM.races[r.id]; const u = 1-Math.abs(o.d-0.5)*2; const pin = r.office==='S'? PM_PIN.indexOf(r.st) : -1; if(pin>=0) return -100+pin; return (r.called?2:0) + (r.office==='G'?0.25:0) - u - (PM_KEY.includes(r.st)&&r.office==='S'?0.6:0) - (r.total>0?0.3:0); };
   const list = have.sort((a,b)=>score(a)-score(b)).slice(0,4);
   el.innerHTML = ctl + list.map(r=>{ const o=PM.races[r.id]; const dc = r.cands.find(c=>c.party==='D'), rc = r.cands.find(c=>c.party==='R');
     const delta = o.prevD!=null? Math.round((o.d-o.prevD)*100) : 0; const arrow = delta? `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'}${Math.abs(delta)}</span>` : '';
@@ -495,39 +501,35 @@ function renderClosing(){
     return `<div class="wave"><div class="t${past?' past':''}"><span style="font-size:inherit;color:inherit;font-weight:inherit">${fmtPT(new Date(k))}${past?' · closed':''}</span><span>${sts.length} state${sts.length>1?'s':''}: ${sts.join(' ')}</span></div><div class="l">${key.length? 'Key: '+key.join(', ') : 'No marquee statewide races'}${hr? ` · <b>${hr}</b> toss-up House seat${hr>1?'s':''}`:''}</div></div>`; }).join('');
   return true;
 }
-function renderFlips(){
-  const el = $('#races'); $('#watchnote').textContent = 'pickups and upsets';
-  const flips = races.filter(r=>r.called && r.gained).sort((a,b)=>new Date(b.calledAt||0)-new Date(a.calledAt||0));
-  const upsets = races.filter(r=>r.called && !r.gained && r.rating && ((r.winner?.party==='D' && /rep/.test(r.rating)) || (r.winner?.party==='R' && /dem/.test(r.rating))));
-  if(!flips.length && !upsets.length) return false;
-  const row = (r,tag)=>`<div class="row"><span class="where">${esc(r.label)}<em>${r.officeName}</em></span><span class="right"><span class="tag ${r.winner?.party}" style="color:#fff;background:${r.winner?.party==='D'?'var(--dem)':'var(--gop)'};padding:3px 8px;font-size:13px;font-weight:900">${tag}</span></span><div class="full" style="font-size:18px;font-weight:700">${esc(r.winner?.first||'')} ${esc(r.winner?.name||'')} <span style="font-weight:500;color:var(--muted)">${r.rating? '· rated '+r.rating.replace('-',' ') : ''}${r.calledAt? ' · '+fmtPT(new Date(r.calledAt)) : ''}</span></div></div>`;
-  el.innerHTML = flips.slice(0,5).map(r=>row(r, r.winner?.party==='D'?'D FLIP':'R FLIP')).join('') + upsets.slice(0,Math.max(0,6-Math.min(5,flips.length))).map(r=>row(r,'UPSET')).join('');
-  return true;
-}
-function renderSwing(){
-  const el = $('#races'); $('#watchnote').textContent = 'margin now vs. 2024 presidential';
-  const rs = races.filter(r=>r.hist && r.total>0 && r.eevp>=20 && r.cands.length>1 && r.office!=='H').map(r=>{ const d=r.cands.find(c=>c.party==='D'), g=r.cands.find(c=>c.party==='R'); if(!d||!g) return null; const m=d.pct-g.pct; return {r, m, shift: m - r.hist.margin}; }).filter(Boolean).sort((a,b)=>Math.abs(b.shift)-Math.abs(a.shift)).slice(0,5);
+function renderRemaining(){
+  const el = $('#races'); $('#watchnote').textContent = 'who needs what of the outstanding vote';
+  const rs = races.filter(r=>!r.called && r.total>0 && r.expected>r.total && r.cands.length>1 && r.office!=='H' || (!r.called && r.total>0 && r.expected>r.total && r.cands.length>1 && r.office==='H' && (r.rating==='tossup')))
+    .map(r=>{ const [a,b]=r.cands; const rem = Math.max(0, r.expected - r.total); const margin = a.votes-b.votes; const share = rem>0? (margin+rem)/(2*rem) : 1; return {r,a,b,rem,margin,share}; })
+    .filter(x=>x.rem>0 && x.share<1.5).sort((x,y)=>(x.r.office==='H')-(y.r.office==='H') || x.share-y.share).slice(0,6);
   if(!rs.length) return false;
-  const fm = m=> (m>0?'D+':'R+')+Math.abs(m).toFixed(1);
-  el.innerHTML = rs.map(({r,m,shift})=>`<div class="row"><span class="where">${esc(r.label)}<em>${r.officeName} · ${Math.round(r.eevp)}% in</em></span><span class="right"></span><div class="full swing"><span style="font-size:17px;color:var(--muted)">${r.hist.label}: <b style="color:var(--ink)">${fm(r.hist.margin)}</b></span><span class="m">now <b style="color:var(--ink);font-weight:900">${fm(m)}</b></span><span class="s ${shift>0?'D':'R'}">${shift>0?'→D':'→R'} ${Math.abs(shift).toFixed(1)}</span></div></div>`).join('');
+  el.innerHTML = rs.map(({r,a,b,rem,margin,share})=>{ const pctIn = r.expected? Math.round(r.total/r.expected*100) : Math.round(r.eevp); const sharePct = +(share*100).toFixed(1);
+    const need = share>=1 ? `<b style="color:var(--gop-ink)">${esc(b.name)} can't catch up</b> on the expected vote` : `<b>${esc(b.name)}</b> needs <b class="${b.party}" style="color:${b.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${sharePct}%</b> of what's left`;
+    return `<div class="row"><span class="where">${esc(r.label)}<em>${r.officeName}</em></span><span class="right">${pctIn}% in · ~${rem>=1e6? (rem/1e6).toFixed(1)+'M' : Math.round(rem/1000)+'K'} left</span>
+      <div class="full" style="display:flex;justify-content:space-between;align-items:baseline;font-size:18px;font-weight:500;color:var(--muted)"><span><b style="color:${a.party==='D'?'var(--dem-ink)':'var(--gop-ink)'};font-weight:900;font-size:22px">${esc(a.name)} +${(margin).toLocaleString()}</b> · ${a.pct.toFixed(1)}–${b.pct.toFixed(1)}</span></div>
+      <div class="full" style="font-size:17px;font-weight:500;color:var(--muted)">${need}</div>
+      <span class="obar full" style="margin-top:6px"><i style="width:${Math.min(100,sharePct)}%;background:${b.party==='D'?'var(--dem)':'var(--gop)'}"></i><b style="left:50%"></b></span></div>`; }).join('');
   return true;
 }
 const PANELS = [
   {id:'watch', title:'Races to watch', render:renderWatch},
   {id:'odds', title:'Odds board', render:renderOdds},
   {id:'closing', title:'Poll closings', render:renderClosing},
-  {id:'flips', title:'Flips & upsets', render:renderFlips},
-  {id:'swing', title:'Swing vs. 2024', render:renderSwing},
+  {id:'remaining', title:'Vote remaining', render:renderRemaining},
 ];
-let panelIdx = 0;
+let panelIdx = 0, panelHold = 0;
 const PANEL_MS = 20000;
-function renderPanel(advance){
+function renderPanel(advance, dir=1){
   for (let k=0;k<PANELS.length;k++){
-    if(advance){ panelIdx = (panelIdx+1)%PANELS.length; advance=false; }
+    if(advance){ panelIdx = (panelIdx+dir+PANELS.length)%PANELS.length; advance=false; }
     const p = PANELS[panelIdx]; $('#ptitle').textContent = p.title;
     if(p.render()) break; panelIdx = (panelIdx+1)%PANELS.length;
   }
-  $('#pdots').innerHTML = PANELS.map((p,i)=>`<i class="${i===panelIdx?'on':''}"></i>`).join('') + `<span>${PANELS[(panelIdx+1)%PANELS.length].title} next</span>`;
+  $('#pdots').innerHTML = PANELS.map((p,i)=>`<i class="${i===panelIdx?'on':''}" data-i="${i}" title="${p.title}"></i>`).join('') + `<span>${panelHold>Date.now()? 'auto-rotate paused' : PANELS[(panelIdx+1)%PANELS.length].title+' next'}</span>`;
 }
 
 function renderCalls(){
@@ -727,13 +729,18 @@ addEventListener('resize', fit); fit();
 buildMap();
 setInterval(renderClock, 1000);
 setInterval(()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }, MAP_CYCLE_MS);
-setInterval(()=>renderPanel(true), PANEL_MS);
+setInterval(()=>{ if(panelHold<Date.now()) renderPanel(true); }, PANEL_MS);
+const manual = fn=>{ panelHold = Date.now()+90000; fn(); };   // a click pauses auto-rotation for 90 s
+$('#pnext').onclick = ()=>manual(()=>renderPanel(true,1));
+$('#pprev').onclick = ()=>manual(()=>renderPanel(true,-1));
+$('#pdots').onclick = e=>{ const i=e.target.dataset?.i; if(i!=null) manual(()=>{ panelIdx=+i; renderPanel(false); }); };
+$('#maphead .title').onclick = ()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); };
 setTimeout(async function pmLoop(){ if(races.length){ await fetchPM(); if(PANELS[panelIdx].id==='odds') renderPanel(false); } setTimeout(pmLoop, 90000); }, 4000);
 tick(); setInterval(tick, POLL_MS);
 addEventListener('keydown', e=>{
   const k = e.key.toLowerCase(); const kinds = {t:null,'1':'strike','2':'fireworks','3':'pinata','4':'slots','5':'kick'};
   if(k in kinds){ const r = races.find(x=>x.office==='S'&&x.st==='TX')||races[0]; if(r){ fxQueue.push({...r, winner:{first:r.cands[0]?.first||'Test',name:r.cands[0]?.name||'Candidate',party:'D'}, gained:'DEM', eevp:r.eevp, kind:kinds[k]}); if(!fxRunning) runFx(); } }
-  if(k==='p'){ renderPanel(true); } if(k==='m'){ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }
+  if(k==='p'||k==='arrowright'){ manual(()=>renderPanel(true,1)); } if(k==='arrowleft'){ manual(()=>renderPanel(true,-1)); } if(k==='m'){ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }
 });
 
 /* ===================== DEMO (#demo in the URL): fake results so you can preview the night ===================== */
