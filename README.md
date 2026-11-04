@@ -22,7 +22,10 @@ All three APIs are public and CORS-enabled, so the page fetches them directly fr
 ## What's on screen
 - **Headline** — what each party still needs for the Senate (House on the line below), with the yellow highlighter treatment.
 - **Balance bars** — Senate and House seats: solid = called, hatched = currently leading, marker at the majority line.
-- **Map** — cycles Senate → Governors → House every 24 s (or click the title). Solid = called, hatched = leading, grey = polls closed / open.
+- **Map** — cycles Senate → Governors → House every 24 s (or click the title). Solid = called, hatched = leading, mid-grey = polls closed and counting, light = polls still open. For states that
+  close in two time zones (KY, IN, FL, NH, TX, MI, KS, ND, ID) the feed gives the first closing time; the page uses AP's
+  last-close time for those to mark the state closed and to label when a race can be called, since AP doesn't call a
+  statewide race until the last polls in the state close.
 - **Rotating panel** (every 20 s; ‹ › arrows, the dots, or ← → keys switch it, which turns auto-rotation off; the
   "Auto" button turns it back on):
   1. **Races to watch** — the closest contests with votes in; toss-ups by poll-closing time before then
@@ -35,19 +38,20 @@ All three APIs are public and CORS-enabled, so the page fetches them directly fr
      contested districts
   6. **California props** — every statewide measure, sorted by how close it is
   Panels with nothing to show yet are skipped automatically.
-- **Runoff tracking** — races with a 50% threshold (e.g. Georgia) get a "runoff likely" badge once nobody is clearing it,
-  and "RUNOFF" when one is declared.
+- **Runoff tracking** — races with a 50% threshold (Georgia statewide → Dec 1; Louisiana House → Dec 12) get a "runoff
+  likely" badge once nobody is clearing it, and "RUNOFF" when one is declared.
 - **Latest calls** ticker, "next poll closing" countdown with the states closing and how many have closed so far, live clock.
 - **Dark mode** and **sound** toggles bottom-right (also `D` and `S` keys; `#dark` in the URL starts dark). Sounds are
   synthesized in the browser — nothing to download — and stay off until you turn them on once, which also satisfies
   browser autoplay rules. Both settings are remembered.
 
 ## The fun part
-Every Democratic call fires one of five animations in rotation, with confetti, a screen shake and (if sound is on) its
+Every Democratic call fires one of eight animations in rotation, with confetti, a screen shake and (if sound is on) its
 own sound effect — rolling ball and pin crash, rocket whistle and boom, bat crack, reel ticks and jackpot chime, kick and
 ref whistle, plus a crowd cheer: a bowling strike
 (googly-eyed ball), the state itself launching as a rocket and bursting into fireworks, a donkey piñata getting whacked,
-a slot machine landing D·D·D with a jackpot coin rain, and a boot kicking a field goal. A burst of calls at once
+a slot machine landing D·D·D with a jackpot coin rain, a boot kicking a field goal, a stampede of blue donkeys,
+a blue wave crashing across the screen, and a UFO beaming the state up into the mothership. A burst of calls at once
 becomes one combined celebration. Republican calls get a quiet corner toast.
 
 ## Running it
@@ -75,7 +79,7 @@ Once hosted, a TV just needs a browser pointed at the URL (TV Bro or Chrome on A
 the ADB scripts below are only for serving from a PC on the same network.
 
 ## Keys
-`T` random celebration · `1`–`5` a specific one · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
+`T` random celebration · `1`–`8` a specific one (test keys need Shift, `#demo` or `?debug`) · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
 Calls already on screen when the page first loads don't re-trigger (remembered in `localStorage`), so refreshing is safe.
 
 ## Notes

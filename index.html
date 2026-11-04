@@ -17,7 +17,7 @@
     --dem:#2E6FE0; --dem-soft:#BBD0F5; --dem-ink:#1E4DA8;
     --gop:#F0562A; --gop-soft:#F8C7B5; --gop-ink:#B83A15;
     --oth:#8C8A84; --oth-soft:#D6D3CC;
-    --map-open:#E6E2D9; --map-closed:#CFCABE; --map-none:#EFECE4;
+    --map-open:#F0EDE5; --map-closed:#C4BEB0; --map-none:#EBE8E0;
   }
   :root[data-theme="dark"]{
     color-scheme: dark only;
@@ -25,7 +25,7 @@
     --dem:#4A86F0; --dem-soft:#2E4E8E; --dem-ink:#7FAAF6;
     --gop:#F4683F; --gop-soft:#9A3F27; --gop-ink:#F9926F;
     --oth:#9A978F; --oth-soft:#3B3A36;
-    --map-open:#262420; --map-closed:#36332D; --map-none:#1C1B18;
+    --map-open:#1E1D1A; --map-closed:#4A453C; --map-none:#171614;
   }
   :root[data-theme="dark"] #map text.on{fill:#fff}
   :root[data-theme="dark"] .bar .num{text-shadow:none}
@@ -81,8 +81,8 @@
   #mapwrap{position:relative;display:flex;flex-direction:column;min-height:0}
   #maphead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
   #maphead .title{font-size:30px;font-weight:900;letter-spacing:-.01em;display:flex;align-items:center;gap:14px}
-  #maphead .title .pill{font-size:15px;font-weight:700;background:var(--ink);color:var(--paper);padding:5px 10px;letter-spacing:.02em}
-  #maphead .legend{display:flex;gap:18px;font-size:17px;font-weight:500;color:var(--muted)}
+  #maphead .title .pill{font-size:15px;font-weight:700;white-space:nowrap;background:var(--ink);color:var(--paper);padding:5px 10px;letter-spacing:.02em}
+  #maphead .legend{display:flex;gap:14px;font-size:16px;font-weight:500;color:var(--muted)}
   .legend i{display:inline-block;width:18px;height:18px;vertical-align:-3px;margin-right:7px}
   .legend .lead.D{background:repeating-linear-gradient(135deg, var(--dem) 0 3px, var(--dem-soft) 3px 7px)} .legend .lead.R{background:repeating-linear-gradient(135deg, var(--gop) 0 3px, var(--gop-soft) 3px 7px)}
   #map{flex:1;min-height:0;width:100%}
@@ -129,7 +129,13 @@
   .arrows{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle}
   .arrows button{all:unset;cursor:pointer;width:40px;height:40px;display:inline-grid;place-items:center;border:2px solid var(--ink);font-size:24px;font-weight:900;line-height:1;position:relative;z-index:5;color:var(--ink);transition:transform .08s}
   .arrows button:hover{background:var(--ink);color:var(--paper)} .arrows button:active{transform:scale(.9)}
-  #maptitle,#mapsub{cursor:pointer}
+  .seg{display:inline-flex;border:2px solid var(--ink);margin-right:auto;flex:none}
+  #maphead .title{order:2;margin:0 14px}
+  #maphead .legend{order:3}
+  .seg button{all:unset;cursor:pointer;font:900 17px/1 "Archivo",system-ui,sans-serif;color:var(--ink);padding:10px 16px;border-right:2px solid var(--ink);min-width:78px;text-align:center}
+  .seg button:last-child{border-right:0} .seg button:hover{background:var(--rule)} .seg button.on{background:var(--ink);color:var(--paper)}
+  .seg button.auto{min-width:92px;color:var(--muted)} .seg button.auto.on{background:var(--hl);color:#151412}
+  #maphead .legend{flex:none}
   #pdots span{margin-left:auto;font-size:16px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:10px}
   #pdots button{all:unset;cursor:pointer;font-size:13px;font-weight:700;border:2px solid var(--ink);padding:3px 9px;color:var(--ink)}
   #pdots button:hover,#pdots button.on{background:var(--ink);color:var(--paper)}
@@ -225,8 +231,9 @@
   <section id="main">
     <div id="mapwrap">
       <div id="maphead">
-        <div class="title" role="button" tabindex="0" aria-label="Switch map"><span id="maptitle">Senate</span><span class="pill" id="mapsub">35 seats</span></div>
-        <div class="legend"><span><i style="background:var(--dem)"></i>Dem win</span><span><i class="lead D"></i>Dem leads</span><span><i class="lead R"></i>Rep leads</span><span><i style="background:var(--gop)"></i>Rep win</span><span><i style="background:var(--map-closed)"></i>Polls closed</span><span><i style="background:var(--map-open)"></i>Polls open</span></div>
+        <div class="title"><span id="maptitle" hidden>Senate</span><span class="pill" id="mapsub">35 seats</span></div>
+        <div class="seg" id="mapseg" role="group" aria-label="Map"><button type="button" data-o="S">Senate</button><button type="button" data-o="G">Governors</button><button type="button" data-o="H">House</button><button type="button" id="mapauto" class="auto on" aria-pressed="true" title="Cycle maps automatically">Auto ▸ on</button></div>
+        <div class="legend"><span><i style="background:var(--dem)"></i>D win</span><span><i class="lead D"></i>D leads</span><span><i class="lead R"></i>R leads</span><span><i style="background:var(--gop)"></i>R win</span><span><i style="background:var(--map-closed)"></i>Closed</span><span><i style="background:var(--map-open);box-shadow:inset 0 0 0 1px var(--muted)"></i>Open</span></div>
       </div>
       <svg id="map" viewBox="0 0 975 610" preserveAspectRatio="xMidYMid meet"></svg>
       <div id="mapfoot"></div>
@@ -258,13 +265,17 @@ const POLL_MS = 30000;
 const MAP_CYCLE_MS = 24000;
 const TZ = 'America/Los_Angeles';
 const DEMO = location.hash.includes('demo');
+// AP does not call a statewide race until the LAST polls in the state close. The feed gives the FIRST closing for split-zone states; AP's last-close times (Pacific) per AP Decision Notes:
+const LAST_CLOSE_PT = {KY:'16:00', IN:'16:00', FL:'17:00', NH:'17:00', TX:'18:00', MI:'18:00', KS:'18:00', ND:'18:00', ID:'20:00'};
+const ptDate = hhmm => new Date(`2026-11-03T${hhmm}:00-08:00`);
 
 /* ===================== STATE ===================== */
 let data = {S:null,G:null,H:null};     // raw json per office
 let races = [];                         // normalized
-let polls = {};                         // state -> closing Date
-let seen = location.hash.includes('demo')? {} : loadSeen();                  // raceId -> party (already celebrated)
-let firstLoad = true;
+let polls = {}, pollsLast = {}, pollsFirst = {};   // state -> first closing Date; last closing (split-zone states +1h); whether split
+let seen = location.hash.includes('demo')? {} : loadSeen();
+const callSeenAt = {};                  // raceId -> party (already celebrated)
+let firstLoad = true; const feedSeen = {S:false,G:false,H:false};
 let lastOk = 0;
 let mapOffice = 'S';
 const fxQueue = [];
@@ -273,7 +284,8 @@ function loadSeen(){ try{ return JSON.parse(localStorage.getItem('en26seen')||'{
 function saveSeen(){ try{ localStorage.setItem('en26seen', JSON.stringify(seen)); }catch(e){} }
 
 /* ===================== FETCH + NORMALIZE ===================== */
-const withTimeout = ms => { try{ return AbortSignal.timeout(ms); }catch(e){ return undefined; } };
+const withTimeout = ms => { try{ return AbortSignal.timeout(ms); }catch(e){ const c = new AbortController(); setTimeout(()=>c.abort(), ms); return c.signal; } };
+let inFlightSince = 0;
 async function fetchAll(){
   const out = {};
   await Promise.all(Object.entries(FILES).map(async ([k,f])=>{
@@ -295,9 +307,10 @@ function normalize(){
       const meta = r.candidate_metadata;
       const total = ru.total_votes||0;
       const cands = (ru.candidates||[]).map(c=>{ const m = meta[c.nyt_id]||{}; return {
-        id:c.nyt_id, name: m.last_name||'?', first:m.first_name||'', party: party(m), inc: !!m.incumbent,
+        id:c.nyt_id, name: m.last_name||'?', first:m.first_name||'', party: party(m), inc: !!m.incumbent, writein: /writein/i.test(c.nyt_id)||/write-?in/i.test(m.last_name||''),
         votes: c.votes?.total||0, pct: total? (c.votes?.total||0)/total*100 : 0, leader: !!c.leader };})
-        .filter(c=>c.id!=='total_writeins').sort((a,b)=>b.votes-a.votes || a.party.localeCompare(b.party));
+        .filter(c=>c.id!=='total_writeins').sort((a,b)=>b.votes-a.votes || (a.writein-b.writein) || ({D:0,R:1,O:2}[a.party]-{D:0,R:1,O:2}[b.party]) || (b.inc-a.inc));
+      { const seenLast = {}; for (const c of cands) seenLast[c.name] = (seenLast[c.name]||0)+1; for (const c of cands) if(seenLast[c.name]>1 && c.first) c.name = c.first+' '+c.name; }
       const won = (r.outcome?.won||[]);
       const winner = won.length ? cands.find(c=>c.id===won[0]) : null;
       const seat = r.seat_number ? String(r.seat_number) : null;
@@ -307,16 +320,17 @@ function normalize(){
         officeName: office==='S'?'Senate':office==='G'?'Governor':'House',
         special: /-S_W-/.test(r.nyt_id) || /special/i.test(r.seat_description||''),
         rating: r.rating||r.general_rating||null, status: r.race_call_status, called: !!winner, winner, gained: r.outcome?.gained||null,
-        calledAt: r.outcome?.winner_accepted_at?.[0] || (winner? r.updated_at : null),
+        calledAt: r.outcome?.winner_accepted_at?.[0] || (winner? (callSeenAt[r.nyt_id] ||= new Date().toISOString()) : null),
         eevp: ru.eevp||0, total, expected: ru.total_expected_vote||0, cands, prev: r.in_party_control, updated: r.updated_at,
-        threshold: r.win_threshold||null, runoff: r.race_call_status==='runoff' || (r.outcome?.advanced_to_runoff||[]).length>0,
+        threshold: (t=>t? (t<=1? t*100 : t) : ((st==='GA' && office!=='H') || (st==='LA' && office==='H')? 50 : null))(r.win_threshold),
+        runoffDate: st==='GA'? 'Dec 1' : st==='LA'? 'Dec 12' : null, runoff: r.race_call_status==='runoff' || (r.outcome?.advanced_to_runoff||[]).length>0,
         hist: (()=>{ const h = ru.historical_comparison_race_data||{}; const k = Object.keys(h)[0]; if(!k) return null; const m = ru.historical_comparison_race_meta?.[k]; return {label: m?.label||'2024', margin: h[k].margin}; })()
       });
     }
   }
   // poll closing times
   const pc = (data.S||data.G||data.H)?.pollClosingTimes||[];
-  polls = {}; for (const p of pc){ const st=p.reporting_unit?.state_postal; if(st) polls[st] = new Date(p.poll_closing_time); }
+  polls = {}; pollsLast = {}; pollsFirst = {}; for (const p of pc){ const st=p.reporting_unit?.state_postal; if(!st) continue; const d = new Date(p.poll_closing_time); const last = LAST_CLOSE_PT[st]? ptDate(LAST_CLOSE_PT[st]) : d; polls[st] = d; pollsLast[st] = last; pollsFirst[st] = last > d; }
 }
 
 function control(office){
@@ -344,8 +358,9 @@ function renderClock(){
   const h = Math.floor(ms/3.6e6), m = Math.floor(ms%3.6e6/6e4), s = Math.floor(ms%6e4/1e3);
   const cd = h? `${h}h ${String(m).padStart(2,'0')}m` : `${m}:${String(s).padStart(2,'0')}`;
   const names = sts.map(x=>NAMES[x]||x); const big = sts.length>3; const list = big ? `${sts.length} states` : names.join(sts.length===3?', ':' and ');
-  const closedN = Object.values(polls).filter(d=>d<=now).length;
-  $('#next').innerHTML = `Next poll closing: <b>${list}</b> at ${fmtPT(new Date(t))} PT · in <b>${cd}</b><small>${big? sts.join(' · ')+' · ' : ''}${closedN} of ${Object.keys(polls).length} states closed so far</small>`;
+  const closedN = Object.values(pollsLast).filter(d=>d<=now).length;
+  const firstOnly = sts.every(x=>pollsFirst[x]);
+  $('#next').innerHTML = `${firstOnly? 'Polls begin closing' : 'Next poll closing'}: <b>${list}</b> at ${fmtPT(new Date(t))} PT · in <b>${cd}</b><small>${big? sts.join(' · ')+' · ' : ''}${closedN} of ${Object.keys(polls).length} states fully closed</small>`;
   if(lastOk){ const ago = Math.max(0, Math.round((now-lastOk)/1000)); const el=$('#status'); el.textContent = ago<90? `Updated ${ago}s ago` : `Reconnecting… last update ${Math.round(ago/60)} min ago`; el.classList.toggle('err', ago>=90); }
 }
 
@@ -380,19 +395,21 @@ function headline(){
   const flipsD = races.filter(r=>r.called && r.winner?.party==='D' && r.gained).length;
   const flipsR = races.filter(r=>r.called && r.winner?.party==='R' && r.gained).length;
   let h, s;
-  const dNeedS = 51-S.dem, rNeedS = 50-S.gop;
-  if(H.winner && S.winner){
-    h = H.winner===S.winner ? `${H.winner==='D'?'Democrats':'Republicans'} win <mark>both chambers</mark>` : `A <mark>split Congress</mark>: ${S.winner==='D'?'Dems':'Reps'} take the Senate, ${H.winner==='D'?'Dems':'Reps'} the House`;
-  } else if(S.winner){
-    h = `${S.winner==='D'?'Democrats':'Republicans'} <mark>win the Senate</mark>`;
+  const dNeedS = Math.max(0,(S.toWin.DEM||51)-S.dem), rNeedS = Math.max(0,(S.toWin.GOP||50)-S.gop);
+  const sWin = S.winner || (dNeedS===0?'D': rNeedS===0?'R': null); const dNeedH = Math.max(0,(H.toWin.DEM||218)-H.dem), rNeedH = Math.max(0,(H.toWin.GOP||218)-H.gop); const hWin = H.winner || (dNeedH===0?'D': rNeedH===0?'R': null);
+  if(hWin && sWin){
+    h = hWin===sWin ? `${hWin==='D'?'Democrats':'Republicans'} win <mark>both chambers</mark>` : `A <mark>split Congress</mark>: ${sWin==='D'?'Dems':'Reps'} take the Senate, ${hWin==='D'?'Dems':'Reps'} the House`;
+  } else if(sWin){
+    h = `${sWin==='D'?'Democrats':'Republicans'} <mark>win the Senate</mark>`;
   } else {
     h = dNeedS<=rNeedS ? `Democrats need <mark>${dNeedS} more</mark> for the Senate` : `Republicans need <mark>${rNeedS} more</mark> to keep the Senate`;
   }
-  if(H.winner) s = `<b>${H.winner==='D'?'Democrats':'Republicans'} win the House.</b> `;
-  else { const dNeed = 218-H.dem, rNeed = 218-H.gop; s = `House: D need <b>${dNeed}</b> more, R need <b>${rNeed}</b> · `; }
+  if(hWin) s = `<b>${hWin==='D'?'Democrats':'Republicans'} win the House.</b> `;
+  else { s = `House: D need <b>${dNeedH}</b> more, R need <b>${rNeedH}</b> · `; }
   const called = races.filter(r=>r.called).length;
   s += called ? `<b>${called}</b> races called` : 'No races called yet';
-  if(flipsD||flipsR) s += ` · flips <b style="color:var(--dem-ink)">D +${flipsD}</b>, <b style="color:var(--gop-ink)">R +${flipsR}</b>`;
+  const flipsI = races.filter(r=>r.called && r.winner?.party==='O' && r.gained).length;
+  if(flipsD||flipsR||flipsI) s += ` · flips <b style="color:var(--dem-ink)">D +${flipsD}</b>, <b style="color:var(--gop-ink)">R +${flipsR}</b>${flipsI?`, <b>I +${flipsI}</b>`:''}`;
   hl.innerHTML = h.replace(/ (\S+)$/, '\u00a0$1'); sub.innerHTML = s;
 }
 
@@ -404,16 +421,16 @@ function stateFill(st, office){
     const won = {D:0,R:0,O:0}, lead = {D:0,R:0,O:0};
     for (const r of rs){ if(r.called) won[r.winner?.party||'O']++; else if(r.total>0 && r.cands[0]) lead[r.cands[0].party]++; }
     const wTot = won.D+won.R+won.O, lTot = lead.D+lead.R+lead.O;
-    if(wTot){ const p = won.D>won.R?'D':won.R>won.D?'R':(lead.D>=lead.R?'D':'R'); return {fill: p==='D'?'var(--dem)':'var(--gop)', on:true}; }
+    if(wTot){ if(won.D===won.R && lTot===0) return {fill:'var(--oth)', on:true}; const p = won.D>won.R?'D':won.R>won.D?'R':(lead.D>=lead.R?'D':'R'); return {fill: p==='D'?'var(--dem)':'var(--gop)', on:true}; }
     if(lTot){ const p = lead.D>=lead.R?'D':'R'; return {fill: p==='D'?'url(#hD)':'url(#hR)', on:false}; }
-    const closed = polls[st] && polls[st] <= new Date();
+    const closed = pollsLast[st] && pollsLast[st] <= new Date();
     return {fill: closed? 'var(--map-closed)':'var(--map-open)', on:false};
   }
   // prefer the called one, else regular (non-special)
   const r = rs.find(x=>x.called) || rs.find(x=>!x.special) || rs[0];
   if(r.called){ const p=r.winner?.party; return {fill: p==='D'?'var(--dem)':p==='R'?'var(--gop)':'var(--oth)', on:true}; }
   if(r.total>0 && r.cands[0]){ const p=r.cands[0].party; return {fill: p==='D'?'url(#hD)':p==='R'?'url(#hR)':'url(#hO)', on:false}; }
-  const closed = polls[st] && polls[st] <= new Date();
+  const closed = pollsLast[st] && pollsLast[st] <= new Date();
   return {fill: closed? 'var(--map-closed)':'var(--map-open)', on:false};
 }
 
@@ -436,6 +453,7 @@ function buildMap(){
 function renderMap(){
   const office = mapOffice;
   $('#maptitle').textContent = office==='S'?'Senate':office==='G'?'Governors':'House';
+  document.querySelectorAll('#mapseg button[data-o]').forEach(b=>b.classList.toggle('on', b.dataset.o===office)); const ma=$('#mapauto'); if(ma){ ma.classList.toggle('on', mapAuto); ma.textContent = mapAuto? 'Auto ▸ on':'Auto ▸ off'; ma.setAttribute('aria-pressed', String(mapAuto)); }
   const n = races.filter(r=>r.office===office).length; const c = races.filter(r=>r.office===office && r.called).length;
   $('#mapsub').textContent = `${c} of ${n} called`;
   for (const st of Object.keys(STATES)){
@@ -473,8 +491,8 @@ function renderWatch(){
   $('#watchnote').textContent = anyVotes? 'closest contests, live' : 'toss-ups by poll closing time';
   if(!list.length){ el.innerHTML = '<div class="empty">The closest contests appear here as votes come in.</div>'; return true; }
   el.innerHTML = list.map(r=>{
-    const [a,b] = [r.cands[0], r.cands[1]||{name:'',party:'O',pct:0}];
-    const inTxt = r.called ? `${r.winner?.party==='D'?'Dem':r.winner?.party==='R'?'Rep':'Ind'} win${r.gained?' · FLIP':''}` : r.total>0 ? `${Math.round(r.eevp)}% in` : (polls[r.st]? `closes ${fmtPT(polls[r.st])}` : '');
+    const [a,b] = r.total>0 ? [r.cands[0], r.cands[1]||{name:'',party:'O',pct:0}] : (()=>{ const d=r.cands.find(c=>c.party==='D'&&!c.writein)||r.cands[0]; const g=r.cands.find(c=>c.party==='R'&&!c.writein)||r.cands.find(c=>c!==d)||{name:'',party:'O',pct:0}; return [d,g]; })();
+    const inTxt = r.called ? `${r.winner?.party==='D'?'Dem':r.winner?.party==='R'?'Rep':'Ind'} win${r.gained?' · FLIP':''}` : r.total>0 ? `${Math.round(r.eevp)}% in` : (pollsLast[r.st]? `closes ${fmtPT(pollsLast[r.st])}` : '');
     const cand = c=>`<div class="cand ${c.party}"><span class="nm${r.called&&r.winner?.id===c.id?' win':''}">${esc(c.name)}${c.inc?' <small style="font-weight:500;color:var(--muted)">inc.</small>':''}</span><span class="pct">${r.total? c.pct.toFixed(1):'—'}</span><span class="trk"><i style="width:${Math.min(100,c.pct)}%"></i></span></div>`;
     return `<div class="race${r.called&&r.gained&&r.winner?.party==='D'?' flipD':''}"><div class="hd"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}${r.special?' special':''}${r.rating?' · '+r.rating.replace('-',' ').replace('rep','R').replace('dem','D'):''}</em></span><span class="in${r.called?' called '+(r.winner?.party||''):''}">${inTxt}</span></div><div class="cands">${cand(a)}${cand(b)}</div></div>`;
   }).join('');
@@ -498,8 +516,8 @@ async function fetchPM(){
       if(e.slug==='balance-of-power-2026-midterms'){ const d = ms.find(m=>/Democrats Sweep/i.test(m.t)); PM.control.sweep = d? d.p : null; const dm=(e.markets||[]).find(m=>/Democrats Sweep/i.test(m.groupItemTitle||'')); try{ PM.tok.sweep = JSON.parse(dm.clobTokenIds)[0]; }catch(_){} continue; }
       if(/which-party-will-win-the-(senate|house)/.test(e.slug)){ const key = e.slug.includes('senate')?'S':'H'; const dm = (e.markets||[]).find(m=>/Democratic/.test(m.groupItemTitle||'')); const d = ms.find(m=>/Democratic/.test(m.t)); PM.control[key] = d? d.p : null; try{ PM.tok[key] = JSON.parse(dm.clobTokenIds)[0]; }catch(_){} continue; }
       for (const r of bySlug[e.slug]||[]){
-        const pick = p => { let m = ms.find(x=>new RegExp('\\('+p+'\\)').test(x.t)); if(!m){ const c = r.cands.find(c=>c.party===p); if(c) m = ms.find(x=>x.t.toLowerCase().includes(c.name.toLowerCase())); } return m; };
-        const d = pick('D'), g = pick('R'); const prev = PM.races[r.id];
+        const pick = p => { const cand = r.cands.find(c=>c.party===p && !c.writein); let m = cand && ms.find(x=>new RegExp('\\b'+cand.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b.*\\('+p+'\\)').test(x.t)); if(!m) m = ms.find(x=>new RegExp('\\('+p+'\\)').test(x.t) && !/^Other/i.test(x.t)); if(!m && cand) m = ms.find(x=>x.t.toLowerCase().includes(cand.name.toLowerCase()) && !/^Other/i.test(x.t)); return m; };
+        let d = pick('D'), g = pick('R'); if(!d){ const ind = r.cands.find(c=>c.party==='O'&&!c.writein); if(ind){ d = ms.find(x=>new RegExp('\\b'+ind.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(x.t)) || ms.find(x=>/^Independent$|\(I\)/i.test(x.t)); if(d) d = {...d, t: ind.first+' '+ind.name+' (I)'}; } } const prev = PM.races[r.id];
         PM.races[r.id] = { d: d? d.p : null, r: g? g.p : null, dName: d?.t.replace(/\s*\([DR]\)\s*$/,'')||'', rName: g?.t.replace(/\s*\([DR]\)\s*$/,'')||'', prevD: prev? (prev.d) : null, slug:e.slug };
       }
     }
@@ -516,7 +534,7 @@ function spark(key){
   const mid = (lo<=0.5 && hi>=0.5) ? `<line x1="0" x2="${w}" y1="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" y2="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/>` : '';
   return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" style="display:block;margin-top:6px">${mid}<path d="${d}" fill="none" stroke="var(--spark)" stroke-width="3" stroke-linejoin="round"/><circle cx="${X(h[h.length-1])}" cy="${Y(h[h.length-1])}" r="4" fill="var(--spark)"/></svg><span style="font-size:13px;opacity:.8">24h ${delta>=0?'+':''}${delta} pts · ${Math.round(lo*100)}–${Math.round(hi*100)}%</span>`;
 }
-function runoffState(r){ if(r.runoff) return 'RUNOFF'; if(r.called||!r.threshold||r.total===0) return null; const top=r.cands[0]?.pct||0; if(r.eevp>=40 && top<r.threshold) return 'runoff likely'; return null; }
+function runoffState(r){ const when = r.runoffDate? ' · '+r.runoffDate : ''; if(r.runoff) return 'RUNOFF'+when; if(r.called||!r.threshold||r.total===0) return null; const top=r.cands[0]?.pct||0; if(r.eevp>=40 && top<r.threshold) return 'runoff likely'+when; return null; }
 function rbadge(r){ const x=runoffState(r); return x? ` <span style="background:var(--hl);color:#151412;font-size:13px;font-weight:900;padding:2px 6px;vertical-align:middle;margin-left:6px">${x}</span>` : ''; }
 function pct(p){ return p==null? '—' : (p>=0.995? '>99' : p<=0.005? '<1' : Math.round(p*100)) + '%'; }
 function renderOdds(){
@@ -526,11 +544,11 @@ function renderOdds(){
   if(!have.length){ if(PM.fetches>=2) return false; el.innerHTML = ctl + '<div class="empty">Race markets load in a moment.</div>'; return !!PM.at; }
   const score = r=>{ const o=PM.races[r.id]; const u = 1-Math.abs(o.d-0.5)*2; const pin = r.office==='S'? PM_PIN.indexOf(r.st) : -1; if(pin>=0) return -100+pin; return (r.called?2:0) + (r.office==='G'?0.25:0) - u - (PM_KEY.includes(r.st)&&r.office==='S'?0.6:0) - (r.total>0?0.3:0); };
   const list = have.sort((a,b)=>score(a)-score(b)).slice(0, (PM.hist.S||PM.hist.H)? 3 : 4);
-  el.innerHTML = ctl + list.map(r=>{ const o=PM.races[r.id]; const dc = r.cands.find(c=>c.party==='D'), rc = r.cands.find(c=>c.party==='R');
+  el.innerHTML = ctl + list.map(r=>{ const o=PM.races[r.id]; const dc = r.cands.find(c=>c.party==='D'&&!c.writein) || r.cands.find(c=>c.party==='O'&&!c.writein), rc = r.cands.find(c=>c.party==='R'&&!c.writein);
     const delta = o.prevD!=null? Math.round((o.d-o.prevD)*100) : 0; const arrow = delta? `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'}${Math.abs(delta)}</span>` : '';
-    const status = r.called? `<b style="color:${r.winner?.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${r.winner?.party==='D'?'Dem':'Rep'} win</b>` : r.total>0? `${Math.round(r.eevp)}% in` : (polls[r.st]? `closes ${fmtPT(polls[r.st])}`:'');
+    const status = r.called? `<b style="color:${r.winner?.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${r.winner?.party==='D'?'Dem':'Rep'} win</b>` : r.total>0? `${Math.round(r.eevp)}% in` : (pollsLast[r.st]? `closes ${fmtPT(pollsLast[r.st])}`:'');
     return `<div class="row"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${status}</span>
-      <div class="full odds"><span class="nm D">${esc(o.dName||dc?.name||'Dem')}</span><span class="v">${r.total&&dc? dc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.d)} ${arrow}<small>odds</small></span>
+      <div class="full odds"><span class="nm ${dc?.party==='O'?'':'D'}">${esc(o.dName||dc?.name||'Dem')}</span><span class="v">${r.total&&dc? dc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.d)} ${arrow}<small>odds</small></span>
       <span class="nm R">${esc(o.rName||rc?.name||'Rep')}</span><span class="v">${r.total&&rc? rc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.r)}<small>odds</small></span>
       <span class="obar"><i style="width:${(o.d*100).toFixed(1)}%"></i><b style="left:50%"></b></span></div></div>`; }).join('');
   return true;
@@ -540,20 +558,20 @@ function renderClosing(){
   for (const [st,d] of Object.entries(polls)){ (groups[d.getTime()]=groups[d.getTime()]||[]).push(st); }
   const keys = Object.keys(groups).map(Number).sort((a,b)=>a-b); if(!keys.length) return false;
   let idx = keys.findIndex(k=>k>now); if(idx<0) idx = keys.length-1; const show = keys.slice(Math.max(0,idx-1), Math.max(0,idx-1)+5);
-  $('#watchnote').textContent = 'all times Pacific';
+  $('#watchnote').textContent = 'all times Pacific · * first polls close; AP waits for the rest of the state';
   el.innerHTML = show.map(k=>{ const sts = groups[k].sort(); const past = k<=now; const key = sts.filter(st=>races.some(r=>r.st===st && (r.office!=='H') && (r.rating==='tossup'||/lean/.test(r.rating||'')))).map(st=>races.filter(r=>r.st===st&&r.office!=='H'&&(r.rating==='tossup'||/lean/.test(r.rating||''))).map(r=>`<b>${NAMES[st]} ${r.officeName}</b>`).join(', ')).filter(Boolean);
     const hr = races.filter(r=>r.office==='H'&&sts.includes(r.st)&&(r.rating==='tossup')).length;
-    return `<div class="wave"><div class="t${past?' past':''}"><span style="font-size:inherit;color:inherit;font-weight:inherit">${fmtPT(new Date(k))}${past?' · closed':''}</span><span>${sts.length} state${sts.length>1?'s':''}: ${sts.join(' ')}</span></div><div class="l">${key.length? 'Key: '+key.join(', ') : 'No marquee statewide races'}${hr? ` · <b>${hr}</b> toss-up House seat${hr>1?'s':''}`:''}</div></div>`; }).join('');
+    return `<div class="wave"><div class="t${past?' past':''}"><span style="font-size:inherit;color:inherit;font-weight:inherit">${fmtPT(new Date(k))}${past?' · closed':''}</span><span>${sts.length} state${sts.length>1?'s':''}: ${sts.map(x=>pollsFirst[x]? x+'*' : x).join(' ')}</span></div><div class="l">${key.length? 'Key: '+key.join(', ') : 'No marquee statewide races'}${hr? ` · <b>${hr}</b> toss-up House seat${hr>1?'s':''}`:''}</div></div>`; }).join('');
   return true;
 }
 function renderRemaining(){
-  const el = $('#races'); $('#watchnote').textContent = 'who needs what of the outstanding vote';
+  const el = $('#races'); $('#watchnote').textContent = 'share of the remaining two-way vote the trailer needs';
   const rs = races.filter(r=>!r.called && r.total>0 && r.expected>r.total && r.cands.length>1 && r.office!=='H' || (!r.called && r.total>0 && r.expected>r.total && r.cands.length>1 && r.office==='H' && (r.rating==='tossup')))
-    .map(r=>{ const [a,b]=r.cands; const rem = Math.max(0, r.expected - r.total); const margin = a.votes-b.votes; const share = rem>0? (margin+rem)/(2*rem) : 1; return {r,a,b,rem,margin,share}; })
+    .map(r=>{ const [a,b]=r.cands; const rem = Math.max(0, r.expected - r.total); const margin = a.votes-b.votes; const rem2 = r.total>0? rem*(a.votes+b.votes)/r.total : rem; const share = rem2>0? (margin+rem2)/(2*rem2) : 1; return {r,a,b,rem,margin,share}; })
     .filter(x=>x.rem>0 && x.share<1.5 && x.r.eevp>=10).sort((x,y)=>(x.r.office==='H')-(y.r.office==='H') || x.share-y.share).slice(0,4);
   if(!rs.length) return false;
   el.innerHTML = rs.map(({r,a,b,rem,margin,share})=>{ const pctIn = r.expected? Math.round(r.total/r.expected*100) : Math.round(r.eevp); const sharePct = +(share*100).toFixed(1);
-    const need = share>=1 ? `<b style="color:var(--gop-ink)">${esc(b.name)} can't catch up</b> on the expected vote` : `<b>${esc(b.name)}</b> needs <b class="${b.party}" style="color:${b.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${sharePct}%</b> of what's left`;
+    const need = (share>=1 && r.eevp>=70) ? `<b style="color:var(--gop-ink)">${esc(b.name)} can't catch up</b> on the expected vote` : share>=1 ? `<b>${esc(b.name)}</b> needs more than all of what's left (expected vote may be revised)` : `<b>${esc(b.name)}</b> needs <b class="${b.party}" style="color:${b.party==='D'?'var(--dem-ink)':'var(--gop-ink)'}">${sharePct}%</b> of what's left`;
     return `<div class="row"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${pctIn}% in · ~${rem>=1e6? (rem/1e6).toFixed(1)+'M' : Math.round(rem/1000)+'K'} left</span>
       <div class="full" style="display:flex;justify-content:space-between;align-items:baseline;font-size:18px;font-weight:500;color:var(--muted)"><span><b style="color:${a.party==='D'?'var(--dem-ink)':'var(--gop-ink)'};font-weight:900;font-size:22px">${esc(a.name)} +${(margin).toLocaleString()}</b> · ${a.pct.toFixed(1)}–${b.pct.toFixed(1)}</span></div>
       <div class="full" style="font-size:17px;font-weight:500;color:var(--muted)">${need}</div>
@@ -568,7 +586,8 @@ async function fetchCA(){
   const get = async u=>{ try{ const r=await fetch(CA_API+u,{cache:'no-cache', signal: withTimeout(20000)}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } };
   const asmN = [...Array(80)].map((_,i)=>i+1), senN = [...Array(20)].map((_,i)=>(i+1)*2);
   const [gov, props, ...rest] = await Promise.all([get('governor'), get('ballot-measures'), ...asmN.map(n=>get('state-assembly/district/'+n)), ...senN.map(n=>get('state-senate/district/'+n))]);
-  if(gov){ CA.gov = caParse(gov); CA.reporting = gov.Reporting||''; }
+  const fresh = j=>{ const t=Date.parse((j&&j.ReportingTime||'').replace(/\./g,'').replace(/(\d) ([ap])m/i,'$1 $2M')); return !t || t >= Date.parse('2026-11-03T08:00:00-08:00'); };
+  if(gov && fresh(gov)){ CA.gov = caParse(gov); CA.reporting = gov.Reporting||''; } else if(gov){ CA.gov=null; CA.reporting='no returns yet'; }
   if(props) CA.props = (props['ballot-measures']||[]).map(x=>({n:+x.Number, name:x.Name, yes:+x.yesPercent||0, no:+x.noPercent||0, votes:(+String(x.yesVotes).replace(/,/g,'')||0)+(+String(x.noVotes).replace(/,/g,'')||0)}));
   CA.asm = rest.slice(0,80).map((j,i)=>j? {...caParse(j), n:asmN[i]} : null).filter(Boolean);
   CA.sen = rest.slice(80).map((j,i)=>j? {...caParse(j), n:senN[i]} : null).filter(Boolean);
@@ -631,7 +650,7 @@ function renderPanel(advance, dir=1){
 
 let callsSig = '';
 function renderCalls(){
-  const calls = races.filter(r=>r.called).sort((a,b)=>new Date(b.calledAt||0)-new Date(a.calledAt||0)).slice(0,40);
+  const calls = races.filter(r=>r.called).sort((a,b)=>(Date.parse(b.calledAt)||0)-(Date.parse(a.calledAt)||0)).slice(0,40);
   const track = $('#calls');
   const sig = calls.map(r=>r.id+(r.winner?.party||'')).join('|'); if(sig===callsSig && calls.length) return; callsSig = sig;
   if(!calls.length){ const first = Object.values(polls).sort((a,b)=>a-b)[0]; track.innerHTML = `<span class="call">No races called yet.${first? ' First polls close at '+fmtPT(first)+' PT.':''}</span>`; track.style.animation='none'; return; }
@@ -656,7 +675,7 @@ function detectCalls(){
     const p = r.winner?.party;
     if(seen[r.id]===p) continue;
     seen[r.id] = p;
-    if(firstLoad && !DEMO) continue;           // don't replay history on startup
+    if(!DEMO && !feedSeen[r.office]) continue;   // first time this feed arrives: record, don't replay history
     if(p==='D') fxQueue.push(r); else toast(r);
   }
   if(!DEMO) saveSeen();
@@ -691,6 +710,12 @@ const SFX = {
   stop(){ tone(500, 0, 0.12, 'square', 0.18, 300); },
   jackpot(){ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f, i*0.09, 0.5, 'triangle', 0.22)); for(let i=0;i<30;i++) tone(2000+Math.random()*2000, 0.6+i*0.08, 0.15, 'sine', 0.06); cheer(0.5); },
   kick(){ noise(0, 0.2, 0.7, 500); tone(90, 0, 0.25, 'sine', 0.5, 40); },
+  gallop(){ for(let i=0;i<28;i++){ tone(70+Math.random()*30, i*0.14+(i%3)*0.03, 0.08, 'triangle', 0.25, 45); } },
+  bray(){ tone(420, 0, 0.35, 'sawtooth', 0.18, 700); tone(700, 0.35, 0.5, 'sawtooth', 0.18, 300); cheer(0.3); },
+  surf(){ noise(0, 3.2, 0.35, 900); tone(60, 0, 3, 'sine', 0.25, 120); },
+  splash(){ noise(0, 1.0, 0.7, 2500); cheer(0.2); },
+  hum(){ tone(140, 0, 2.4, 'sine', 0.2, 160); tone(143, 0, 2.4, 'sine', 0.2, 165); },
+  beam(){ for(let i=0;i<10;i++) tone(300+i*120, i*0.12, 0.4, 'square', 0.08, 900+i*120); tone(1200, 1.3, 1.2, 'sine', 0.2, 2400); cheer(0.8); },
   good(){ tone(1400, 0.1, 0.5, 'square', 0.12, 1380); tone(1400, 0.7, 0.9, 'square', 0.12, 1390); cheer(0.2); },
   bonk(){ tone(220, 0, 0.35, 'triangle', 0.18, 110); }
 };
@@ -698,7 +723,7 @@ function setSound(on){ soundOn = on; try{ localStorage.setItem('en26sound', on?'
 /* ===================== CELEBRATIONS (confetti + five goofy animations) ===================== */
 let fxRunning = false, fxKind = -1;
 const fx = $('#fx'), fxc = $('#fxc'), ctx = fxc.getContext('2d');
-const KINDS = ['strike','fireworks','pinata','slots','kick'];
+const KINDS = ['strike','fireworks','pinata','slots','kick','stampede','wave','ufo'];
 const C = { ink:'#151412', paper:'#F7F4EC' };
 function readTheme(){ const cs=getComputedStyle(document.documentElement); C.ink=cs.getPropertyValue('--ink').trim()||'#151412'; C.paper=cs.getPropertyValue('--paper').trim()||'#F7F4EC'; }
 function runFx(){
@@ -733,6 +758,61 @@ function runFx(){
 const rr=(a,b)=>a+Math.random()*(b-a);
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 const ANIMS = {
+  /* 6 — a stampede of blue donkeys thunders across the screen */
+  stampede({W,H,r,hit}){
+    const A = {dur:8.5, struck:false, struckAt:0}; SFX.gallop(); const S=Math.min(H*0.09,95);
+    const herd=[...Array(9)].map((_,i)=>({x:-S*3-i*S*2.2-Math.random()*S*2, y:H*(0.52+((i*7)%4)*0.09), v:W/110*(0.9+Math.random()*0.3), ph:Math.random()*6, s:S*(0.8+((i*5)%3)*0.15)}));
+    const dust=[];
+    const donkey=(x,y,s,t)=>{ ctx.save(); ctx.translate(x,y); const bob=Math.sin(t*14)*s*0.08; ctx.translate(0,bob); ctx.fillStyle='#2E6FE0'; ctx.strokeStyle=C.ink; ctx.lineWidth=4;
+      roundRect(-s*0.9,-s*0.45,s*1.8,s*0.9,s*0.3); ctx.fill(); ctx.stroke();
+      const legs=[[-s*0.7,1],[-s*0.3,-1],[s*0.3,1],[s*0.7,-1]]; for(const [lx,d] of legs){ ctx.save(); ctx.translate(lx,s*0.4); ctx.rotate(Math.sin(t*14+lx)*0.6*d); ctx.fillRect(-s*0.09,0,s*0.18,s*0.5); ctx.strokeRect(-s*0.09,0,s*0.18,s*0.5); ctx.restore(); }
+      ctx.beginPath(); ctx.moveTo(s*0.8,-s*0.4); ctx.lineTo(s*1.25,-s*0.95); ctx.lineTo(s*1.5,-s*0.8); ctx.lineTo(s*1.05,-s*0.2); ctx.closePath(); ctx.fill(); ctx.stroke();
+      roundRect(s*1.15,-s*1.15,s*0.75,s*0.5,s*0.15); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#FFE34D'; for(const ex of [s*1.2,s*1.45]){ ctx.beginPath(); ctx.moveTo(ex,-s*1.1); ctx.lineTo(ex+s*0.1,-s*1.55); ctx.lineTo(ex+s*0.22,-s*1.1); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+      ctx.fillStyle=C.paper; ctx.beginPath(); ctx.arc(s*1.7,-s*0.98,s*0.11,0,7); ctx.fill(); ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(s*1.73,-s*0.97,s*0.05,0,7); ctx.fill();
+      ctx.strokeStyle=C.ink; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(-s*0.9,-s*0.3); ctx.quadraticCurveTo(-s*1.5,-s*0.6+Math.sin(t*10)*s*0.3,-s*1.3,s*0.1); ctx.stroke(); ctx.restore(); };
+    A.frame = t=>{
+      for(const d of herd){ d.x+=d.v; if(Math.random()<0.5) dust.push({x:d.x-d.s,y:d.y+d.s*0.9,r:rr(6,18),a:1,vx:-rr(1,3),vy:-rr(0.5,2)}); donkey(d.x,d.y,d.s,t+d.ph); }
+      for(const d of dust){ d.x+=d.vx; d.y+=d.vy; d.a-=0.02; d.r+=0.4; ctx.globalAlpha=Math.max(0,d.a)*0.5; ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill(); } ctx.globalAlpha=1;
+      for(let i=dust.length-1;i>=0;i--) if(dust[i].a<=0) dust.splice(i,1);
+      if(!A.struck && herd[0].x>W*0.45){ A.struck=true; A.struckAt=t; hit('STAMPEDE!','bray'); } };
+    return A;
+  },
+  /* 7 — a blue wave crashes across the whole screen */
+  wave({W,H,hit}){
+    const A = {dur:8, struck:false, struckAt:0}; SFX.surf(); const drops=[];
+    A.frame = t=>{
+      const front = -W*0.3 + (W*1.6)*Math.min(1,t/2.6);
+      ctx.save(); ctx.beginPath(); ctx.moveTo(-50,H+50);
+      for(let x=-50;x<=front+200;x+=12){ const d=front-x; const crest = d<0? 0 : Math.min(1,d/(W*0.35)); const y = H - H*0.62*crest - Math.sin(x/70+t*4)*18*crest - (d>-60&&d<120? Math.max(0,1-Math.abs(d-40)/100)*H*0.18 : 0); ctx.lineTo(x,y); }
+      ctx.lineTo(front+200,H+50); ctx.closePath(); const g=ctx.createLinearGradient(0,H*0.3,0,H); g.addColorStop(0,'#4A86F0'); g.addColorStop(1,'#1E4DA8'); ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle=C.paper; ctx.lineWidth=8; ctx.stroke(); ctx.restore();
+      // foam at the lip
+      for(let i=0;i<4;i++) drops.push({x:front+rr(-80,60), y:H*0.38+rr(-40,40), vx:rr(2,12), vy:-rr(2,9), r:rr(4,12), a:1});
+      for(const d of drops){ d.x+=d.vx; d.y+=d.vy; d.vy+=0.35; d.a-=0.018; ctx.globalAlpha=Math.max(0,d.a); ctx.fillStyle=C.paper; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill(); } ctx.globalAlpha=1;
+      for(let i=drops.length-1;i>=0;i--) if(drops[i].a<=0) drops.splice(i,1);
+      if(!A.struck && front>W*0.6){ A.struck=true; A.struckAt=t; hit('BLUE WAVE!','splash'); } };
+    return A;
+  },
+  /* 8 — a UFO beams the state up into the mothership */
+  ufo({W,H,r,hit}){
+    const A = {dur:8.5, struck:false, struckAt:0}; SFX.hum(); const st = STATES[r.st] || STATES.TX; const path = new Path2D(st.d); const sc = Math.min(H*0.42/300, 2);
+    A.frame = t=>{
+      const ux = W*0.5 + Math.sin(t*1.3)*W*0.04, uy = Math.min(H*0.22, -150 + t*220) + Math.sin(t*2.5)*10; const uw=Math.min(W*0.28,520);
+      const lift = Math.max(0, Math.min(1,(t-2.2)/3.2)); const sy = H*0.72 - (H*0.72-uy)*lift; const spin = lift*Math.PI*4; const scale = sc*(1-lift*0.75);
+      if(t>1.2){ // beam
+        ctx.save(); ctx.globalAlpha=0.35+Math.sin(t*20)*0.1; const bg=ctx.createLinearGradient(0,uy,0,H); bg.addColorStop(0,'#FFE34D'); bg.addColorStop(1,'rgba(255,227,77,0)'); ctx.fillStyle=bg; ctx.beginPath(); ctx.moveTo(ux-uw*0.12,uy); ctx.lineTo(ux+uw*0.12,uy); ctx.lineTo(ux+uw*0.5,H); ctx.lineTo(ux-uw*0.5,H); ctx.closePath(); ctx.fill(); ctx.restore(); }
+      // the state
+      ctx.save(); ctx.translate(ux,sy); ctx.rotate(spin); ctx.scale(scale,scale); ctx.translate(-st.c[0],-st.c[1]); ctx.fillStyle='#2E6FE0'; ctx.strokeStyle=C.ink; ctx.lineWidth=4/scale; ctx.fill(path); ctx.stroke(path); ctx.restore();
+      ctx.fillStyle=C.ink; ctx.font=`900 ${Math.round(H*0.05*(1-lift*0.6))}px Archivo, sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(r.st, ux, sy);
+      // saucer
+      ctx.save(); ctx.translate(ux,uy); ctx.fillStyle='#8C8A84'; ctx.strokeStyle=C.ink; ctx.lineWidth=5; ctx.beginPath(); ctx.ellipse(0,0,uw*0.5,uw*0.12,0,0,7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#BBD0F5'; ctx.beginPath(); ctx.ellipse(0,-uw*0.08,uw*0.2,uw*0.13,0,Math.PI,0); ctx.fill(); ctx.stroke();
+      for(let i=-3;i<=3;i++){ ctx.fillStyle = (Math.floor(t*6)+i)%2? '#FFE34D':'#F0562A'; ctx.beginPath(); ctx.arc(i*uw*0.12, uw*0.04, uw*0.022,0,7); ctx.fill(); }
+      // googly eyes in the dome, obviously
+      ctx.fillStyle=C.paper; ctx.beginPath(); ctx.arc(-uw*0.06,-uw*0.1,uw*0.035,0,7); ctx.arc(uw*0.06,-uw*0.1,uw*0.035,0,7); ctx.fill(); ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(-uw*0.05+Math.sin(t*3)*uw*0.012,-uw*0.1,uw*0.015,0,7); ctx.arc(uw*0.07+Math.sin(t*3)*uw*0.012,-uw*0.1,uw*0.015,0,7); ctx.fill(); ctx.restore();
+      if(!A.struck && lift>=1){ A.struck=true; A.struckAt=t; hit('ABDUCTED!','beam'); } };
+    return A;
+  },
   /* 1 — bowling strike with a googly-eyed ball */
   strike({W,H,hit}){
     const laneY = H*0.70, R = Math.min(H*0.11,120), px = W*0.72, pinW = R*0.55, pinH = R*1.9;
@@ -844,7 +924,7 @@ const ANIMS = {
 /* ===================== MAIN LOOP ===================== */
 let inFlight = false;
 async function tick(){
-  if(inFlight) return; inFlight = true;
+  if(inFlight && Date.now()-inFlightSince < 60000) return; inFlight = true; inFlightSince = Date.now();
   try{ await tickInner(); } finally { inFlight = false; }
 }
 async function tickInner(){
@@ -853,7 +933,7 @@ async function tickInner(){
   if(ok){ for (const k in fresh) if(fresh[k]) data[k]=fresh[k]; lastOk = Date.now(); }
   else if(!lastOk){ const el=$('#status'); el.textContent = "Can't reach the results feed — retrying"; el.classList.add('err'); }
   if(DEMO) demoMutate();
-  normalize(); renderAll(); detectCalls(); if(ok) firstLoad = false;
+  normalize(); renderAll(); detectCalls(); if(ok) firstLoad = false; for (const k in fresh) if(fresh[k]) feedSeen[k] = true;
   renderClock();
 }
 
@@ -869,7 +949,7 @@ let wakeLock = null;
 async function keepAwake(){ try{ if('wakeLock' in navigator && document.visibilityState==='visible'){ wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', ()=>{ wakeLock=null; }); } }catch(e){ console.warn('wake lock', e.message); } }
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible' && !wakeLock) keepAwake(); });
 keepAwake(); setInterval(()=>{ if(!wakeLock) keepAwake(); }, 60000);
-setInterval(()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }, MAP_CYCLE_MS);
+setInterval(()=>{ if(mapAuto){ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); } }, MAP_CYCLE_MS);
 setInterval(()=>{ if(autoRotate) renderPanel(true); }, PANEL_MS);
 const manual = fn=>{ autoRotate = false; fn(); };   // a manual switch turns auto-rotation off; the Auto button turns it back on
 $('#watch').addEventListener('click', e=>{
@@ -878,8 +958,10 @@ $('#watch').addEventListener('click', e=>{
   else if(b.id==='pprev') manual(()=>renderPanel(true,-1));
   else if(b.dataset.i!=null) manual(()=>{ panelIdx=+b.dataset.i; renderPanel(false); });
 });
-$('#maphead .title').onclick = ()=>{ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); };
-$('#maphead .title').onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('#maphead .title').click(); } };
+let mapAuto = true;
+$('#mapseg').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
+  if(b.id==='mapauto'){ mapAuto = !mapAuto; } else { mapOffice = b.dataset.o; mapAuto = false; }
+  renderMap(); });
 setTimeout(async function caLoop(){ await fetchCA(); if(['ca','props'].includes(PANELS[panelIdx].id)) renderPanel(false); setTimeout(caLoop, 120000); }, 6000);
 setTimeout(async function pmLoop(){ if(races.length){ await fetchPM(); if(PANELS[panelIdx].id==='odds') renderPanel(false); } setTimeout(pmLoop, 90000); }, 4000);
 tick(); setInterval(tick, POLL_MS);
@@ -893,10 +975,10 @@ if(soundOn){ const b=$('#soundbtn'); b.classList.add('on'); b.textContent='Sound
   audio(); setTimeout(()=>{ if(!AC || AC.state!=='running'){ b.textContent='Sound: tap to enable'; addEventListener('pointerdown', arm); addEventListener('keydown', arm); } }, 500); }
 addEventListener('keydown', e=>{
   if(e.key==='s'||e.key==='S') setSound(!soundOn); if(e.key==='d'||e.key==='D') $('#themebtn').click();
-  const k = e.key.toLowerCase(); const kinds = {t:null,'1':'strike','2':'fireworks','3':'pinata','4':'slots','5':'kick'};
+  const k = e.key.toLowerCase(); const kinds = {t:null,'1':'strike','2':'fireworks','3':'pinata','4':'slots','5':'kick','6':'stampede','7':'wave','8':'ufo'};
   const testOK = DEMO || location.search.includes('debug') || e.shiftKey;
   if(k in kinds && testOK){ const r = races.find(x=>x.office==='S'&&x.st==='TX')||races[0]; if(r){ fxQueue.push({...r, winner:{first:r.cands[0]?.first||'Test',name:r.cands[0]?.name||'Candidate',party:'D'}, gained:'DEM', eevp:r.eevp, kind:kinds[k]}); if(!fxRunning) runFx(); } }
-  if(k==='p'||k==='arrowright'){ manual(()=>renderPanel(true,1)); } if(k==='arrowleft'){ manual(()=>renderPanel(true,-1)); } if(k==='m'){ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; renderMap(); }
+  if(k==='p'||k==='arrowright'){ manual(()=>renderPanel(true,1)); } if(k==='arrowleft'){ manual(()=>renderPanel(true,-1)); } if(k==='m'){ mapOffice = mapOffice==='S'?'G':mapOffice==='G'?'H':'S'; mapAuto=false; renderMap(); }
 });
 
 /* ===================== DEMO (#demo in the URL): fake results so you can preview the night ===================== */
