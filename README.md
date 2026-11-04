@@ -40,7 +40,8 @@ All three APIs are public and CORS-enabled, so the page fetches them directly fr
   Panels with nothing to show yet are skipped automatically.
 - **Runoff tracking** — races with a 50% threshold (Georgia statewide → Dec 1; Louisiana House → Dec 12) get a "runoff
   likely" badge once nobody is clearing it, and "RUNOFF" when one is declared.
-- **Latest calls** ticker, "next poll closing" countdown with the states closing and how many have closed so far, live clock.
+- **Latest calls** strip: a slow marquee of call chips (party, race, winner, FLIP) grouped by minute so a burst of calls
+  shares one timestamp; plus the "next poll closing" countdown and a live clock.
 - **Dark mode** and **sound** toggles bottom-right (also `D` and `S` keys; `#dark` in the URL starts dark). Sounds are
   synthesized in the browser — nothing to download — and stay off until you turn them on once, which also satisfies
   browser autoplay rules. Both settings are remembered.
