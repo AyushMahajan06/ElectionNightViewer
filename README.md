@@ -7,8 +7,12 @@ prediction-market odds, and a celebration every time a race is called for the De
 
 **Live:** https://election.ayushmahajan.com
 
-Open `index.html` in any modern browser. No build step, no server required, nothing to install.
+Open `index.html` in any modern browser. No build step, nothing to install (`feed-worker.js` and `anims.js` sit next to it).
 Everything updates on its own; there are no menus to click through, so it works on a TV across the room.
+
+**On a phone:** `mobile.html` (served as `/m` on the live site) is the same data in a vertical, scrollable layout — tap a
+state for its races, sections instead of rotating panels, calls as a list. Phones opening `index.html` are sent there
+automatically (add `?tv` to stay on the TV layout).
 
 ## Data sources
 | What | Source | Refresh |
@@ -47,7 +51,8 @@ All three APIs are public and CORS-enabled, so the page fetches them directly fr
   browser autoplay rules. Both settings are remembered.
 
 ## The fun part
-Every Democratic call fires one of 38 animations, picked at random with no repeat inside any three-animation window, with confetti, a screen shake and (if sound is on) its
+Every Democratic call fires one of 63 animations — drawn from a shuffled deck, so every one plays before any repeats
+(the deck survives reloads) and nothing comes back within three calls — with confetti, a screen shake and (if sound is on) its
 own sound effect — rolling ball and pin crash, rocket whistle and boom, bat crack, reel ticks and jackpot chime, kick and
 ref whistle, plus a crowd cheer: a bowling strike
 (googly-eyed ball), the state itself launching as a rocket and bursting into fireworks, a donkey piñata getting whacked,
@@ -56,7 +61,11 @@ a blue wave, a UFO abduction, a T. rex, a wrecking ball, a jetpack donkey, a cir
 a volcano, whack-a-mole, the pins' revenge, a rubber-duck armada, an air horn, a pizza delivery, a toaster, a giant hand
 ("YOINK!"), a laser cat, a hot-air balloon, bubble wrap, a prize wheel, a snow globe, a donkey DJ, a cow catapult, a submarine,
 a treadmill, a DVD-logo ball that hits the corner, a drive-thru order #218, an elevator to floor 218, a gnome parade, a roller
-coaster loop, a lasso, and a falling piano. When AP calls a chamber for the
+coaster loop, a lasso, a falling piano, a zamboni slapshot, a donkey kaiju, a car wash, popcorn, a skydiving
+formation, a meteor, a washing machine spin cycle, tug of war, a jack-in-the-box, limbo, a moon landing, sumo, a hot-dog
+eating contest, a parade balloon, a trampoline, a typewriter, a magician's hat, soft-serve ice cream, a rocket car, a
+vending machine that won't drop, dominoes, a conga line, a claw machine that actually works, a skateboard kickflip over a
+shark tank, and a barbecue. When AP calls a chamber for the
 Democrats there's a much longer multi-act finale (one for the House, one for the Senate) that plays exactly once. A burst of calls at once
 becomes one combined celebration. Republican calls get a quiet corner toast.
 
@@ -79,6 +88,9 @@ It's a static page, so any static host works. On Vercel:
 **Analytics:** Vercel Web Analytics is wired in via the plain-HTML snippet (`/_vercel/insights/script.js`), loaded only when
 the page is served over https; enable Web Analytics on the Vercel project and page views appear after the next deploy.
 
+Vercel Web Analytics is included via the plain-HTML snippet (`/_vercel/insights/script.js`); it reports only when served
+by Vercel with Analytics enabled for the project, and is inert anywhere else.
+
 **Custom domain (Cloudflare DNS):** in Vercel, Settings → Domains → add the subdomain. In Cloudflare, add a `CNAME`
 record for it pointing to `cname.vercel-dns.com` with proxy status **DNS only** (grey cloud) — with the orange proxy on,
 Vercel can't verify the domain or issue its certificate. The domain goes valid within a couple of minutes and Vercel
@@ -95,6 +107,10 @@ Calls already on screen when the page first loads don't re-trigger (remembered i
 - Race calls and the "flip" flag are AP's. Expected-vote totals are AP estimates and get revised during the night.
 - Polymarket market slugs follow `<state>-senate-election-winner` and `<state>-governor-winner-2026`; races without a
   market don't appear on the odds board.
+- Performance: the feeds are fetched and parsed in a Web Worker (the House file is ~7 MB; the House feed is polled every
+  60 s, Senate/governors every 30 s, California only after its polls close), each part of the screen repaints only when its
+  data changed, and repeated characters in the animations are cached as sprites. Falls back to in-page fetching if the
+  worker can't start (e.g. opening the file directly on some browsers).
 - The map geometry is from [us-atlas](https://github.com/topojson/us-atlas) (Albers USA), simplified and inlined.
 
 MIT License.

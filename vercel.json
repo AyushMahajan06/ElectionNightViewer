@@ -28,6 +28,43 @@
           "value": "no-cache"
         }
       ]
+    },
+    {
+      "source": "/feed-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/mobile.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/m",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/m",
+      "destination": "/mobile.html"
+    },
+    {
+      "source": "/mobile",
+      "destination": "/mobile.html"
     }
   ]
 }

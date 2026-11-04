@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F7F4EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131210" media="(prefers-color-scheme: dark)">
+<title>Election Night 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&display=swap" rel="stylesheet">
+<script>
+  // Vercel Web Analytics (plain-HTML variant). Only loads when served over https, so the local file:// copy stays clean.
+  if(location.protocol==='https:'){ window.va = window.va || function(){ (window.vaq = window.vaq || []).push(arguments); }; const s=document.createElement('script'); s.defer=true; s.src='/_vercel/insights/script.js'; document.head.appendChild(s); }
+</script>
+<style>
+  /* ---- tokens: identical to the TV page ---- */
+  :root{
+    color-scheme: light only;
+    --paper:#F7F4EC; --ink:#151412; --muted:#7A7467; --rule:#E2DED4; --card:#4A4741; --card-ink:#F7F4EC; --spark:#FFE34D;
+    --hl:#FFE34D;
+    --dem:#2E6FE0; --dem-soft:#BBD0F5; --dem-ink:#1E4DA8;
+    --gop:#F0562A; --gop-soft:#F8C7B5; --gop-ink:#B83A15;
+    --oth:#8C8A84; --oth-soft:#D6D3CC;
+    --map-open:#F4F1EA; --map-closed:#B3AC9D; --map-none:#E7E3DA; --map-stroke:#C9C3B6;
+    --gutter:16px; --topbar:58px;
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark only;
+    --paper:#131210; --ink:#F3EFE6; --muted:#A39D91; --rule:#2B2925; --card:#26241F; --card-ink:#F3EFE6; --spark:#8FB4FF;
+    --dem:#4A86F0; --dem-soft:#2E4E8E; --dem-ink:#7FAAF6;
+    --gop:#F4683F; --gop-soft:#9A3F27; --gop-ink:#F9926F;
+    --oth:#9A978F; --oth-soft:#3B3A36;
+    --map-open:#1B1A17; --map-closed:#5B554B; --map-none:#15140F; --map-stroke:#3B3831;
+  }
+  :root[data-theme="dark"] #map text.on{fill:#fff}
+  :root[data-theme="dark"] .bar .num{text-shadow:none}
+  :root[data-theme="dark"] #headline mark,:root[data-theme="dark"] .flip,:root[data-theme="dark"] .rbadge{color:#151412}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper);-webkit-text-size-adjust:100%}
+  body{min-height:100%;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;font-size:17px;line-height:1.35;overflow-x:hidden;overflow-wrap:anywhere}
+  b,strong{font-weight:700}
+  button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+  :root[data-theme="dark"] button:focus-visible{outline-color:var(--spark)}
+  .num,.tnum{font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- sticky top bar ---- */
+  #top{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:3px solid var(--ink);padding:0 var(--gutter);padding-top:env(safe-area-inset-top);height:calc(var(--topbar) + env(safe-area-inset-top));display:flex;align-items:center}
+  #topin{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  #top .brand{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.15}
+  #top .brand .t{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  @media (max-width:419px){ #top .brand .yr{display:none} }
+  #top .live{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--paper);padding:3px 7px;font-size:11px;font-weight:700;letter-spacing:.02em}
+  #top .live i{width:7px;height:7px;border-radius:50%;background:#FF3B3B;animation:blink 1.4s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  #top .status{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  #top .status.err{color:var(--gop-ink)}
+  #top .right{display:flex;align-items:center;gap:8px;flex:none}
+  #top .clock{font-size:22px;font-weight:900;white-space:nowrap}
+  #top .clock small{font-size:12px;font-weight:700;color:var(--muted);margin-left:3px}
+  #themebtn{width:44px;height:44px;display:grid;place-items:center;border:2px solid var(--ink);color:var(--ink)}
+  #themebtn svg{width:22px;height:22px;display:block}
+  #themebtn .sun{display:none} :root[data-theme="dark"] #themebtn .sun{display:block} :root[data-theme="dark"] #themebtn .moon{display:none}
+
+  /* ---- next poll closing strip ---- */
+  #next{padding:10px var(--gutter);font-size:14px;font-weight:500;color:var(--muted);border-bottom:1px solid var(--rule);line-height:1.3}
+  #next:empty{display:none}
+  #next b{color:var(--ink);font-weight:700}
+  #next small{display:block;font-size:12.5px;margin-top:2px}
+
+  /* ---- hero ---- */
+  main{padding-bottom:40px}
+  #hero{padding:22px var(--gutter) 6px}
+  #headline{font-size:clamp(30px,8.6vw,40px);line-height:1.08;font-weight:900;letter-spacing:-.02em;text-wrap:balance}
+  #headline mark{background:none;color:inherit;
+    background-image:linear-gradient(104deg, transparent 0 2%, var(--hl) 2% 98%, transparent 98%);
+    background-size:100% 78%;background-repeat:no-repeat;background-position:0 70%;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .06em}
+  #sub{margin-top:12px;font-size:15px;font-weight:500;color:var(--muted);line-height:1.4}
+  #sub b{color:var(--ink);font-weight:700}
+
+  /* ---- balance bars ---- */
+  .bops{padding:18px var(--gutter) 8px;display:flex;flex-direction:column;gap:22px}
+  .bop .name{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+  .bop .name span{font-size:22px;font-weight:900;letter-spacing:-.01em}
+  .bop .name small{font-size:13px;font-weight:500;color:var(--muted);text-align:right;line-height:1.25}
+  .bop .name small b{font-weight:700}
+  .bar{position:relative;height:44px;background:var(--rule)}
+  .bar .d,.bar .r,.bar .dl,.bar .rl{position:absolute;top:0;bottom:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+  .bar .d{left:0;background:var(--dem)} .bar .r{right:0;background:var(--gop)}
+  .bar .dl{background:var(--dem-soft)} .bar .rl{right:0;background:var(--gop-soft)}
+  .bar .maj{position:absolute;top:-7px;bottom:-7px;width:3px;background:var(--ink);left:50%;transform:translateX(-50%)}
+  .bar .num{position:absolute;top:0;height:100%;display:flex;align-items:center;line-height:1;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15);white-space:nowrap}
+  .bar .num.d{left:10px} .bar .num.r{right:10px}
+  .bar .num small{font-size:11px;font-weight:700;margin:0 5px;opacity:.9}
+  .bop .foot{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;font-size:13px;font-weight:500;color:var(--muted);margin-top:12px;line-height:1.3}
+  .bop .foot b{color:var(--ink)}
+  .bop .foot .mj{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bop .foot span:last-child{text-align:right}
+
+  /* ---- sections ---- */
+  section.s{padding:22px var(--gutter) 10px;border-top:3px solid var(--ink);margin-top:18px;scroll-margin-top:calc(var(--topbar) + env(safe-area-inset-top) + 4px)}
+  section.s>h2{font-size:24px;font-weight:900;letter-spacing:-.01em;line-height:1.1;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  section.s>h2 .pill{font-size:12px;font-weight:700;white-space:nowrap;background:var(--ink);color:var(--paper);padding:4px 8px;letter-spacing:.02em;flex:none}
+  section.s>.note{font-size:13.5px;font-weight:500;color:var(--muted);margin-top:6px;line-height:1.35}
+  section.s>.note::before{content:"";display:inline-block;width:16px;height:3px;background:var(--hl);vertical-align:middle;margin-right:7px}
+  section.s>.note:empty{display:none}
+  .body{margin-top:12px}
+  .empty{font-size:15px;font-weight:500;color:var(--muted);line-height:1.5;padding:10px 0 4px}
+
+  /* ---- map ---- */
+  .seg{display:flex;border:2px solid var(--ink);margin-top:14px}
+  .seg button{flex:1;font:900 15px/1 "Archivo",system-ui,sans-serif;color:var(--ink);min-height:44px;display:grid;place-items:center;border-right:2px solid var(--ink);text-align:center}
+  .seg button:last-child{border-right:0} .seg button.on{background:var(--ink);color:var(--paper)}
+  #map{display:block;width:100%;height:auto;margin-top:14px;touch-action:manipulation}
+  #map path{stroke:var(--map-stroke);stroke-width:1.2;transition:fill .6s}
+  #map text{font-size:16px;font-weight:700;pointer-events:none;fill:var(--ink)}
+  #map text.on{fill:#fff}
+  #map .ne rect{stroke:var(--map-stroke);stroke-width:1.2;transition:fill .6s}
+  #map .ne text{font-size:15px}
+  #map .hit{fill:transparent;stroke:none;cursor:pointer}
+  @media (max-width:520px){ #map text{font-size:24px} #map .ne text{font-size:20px} }
+  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;font-size:12.5px;font-weight:500;color:var(--muted);margin-top:10px}
+  .legend span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .legend i{display:inline-block;width:14px;height:14px;flex:none}
+  .legend .lead.D{background:repeating-linear-gradient(135deg, var(--dem) 0 3px, var(--dem-soft) 3px 7px)} .legend .lead.R{background:repeating-linear-gradient(135deg, var(--gop) 0 3px, var(--gop-soft) 3px 7px)}
+  #mapfoot{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px;margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+  #mapfoot span{display:flex;flex-direction:column;font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.2}
+  #mapfoot b{color:var(--ink);font-weight:900;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+  #mapfoot .dem{color:var(--dem-ink)} #mapfoot .gop{color:var(--gop-ink)}
+
+  /* ---- race rows (watch, CA) ---- */
+  .race{border-top:2px solid var(--ink);padding:10px 0 12px}
+  .race:first-child{border-top:0;padding-top:2px}
+  .race .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px;font-weight:700;margin-bottom:8px}
+  .race .hd .where{font-size:19px;font-weight:900;min-width:0}
+  .race .hd .where em{display:block;font-style:normal;font-weight:500;color:var(--muted);font-size:13.5px;margin-top:1px}
+  .race .hd .in{font-weight:500;color:var(--muted);white-space:nowrap;flex:none;text-align:right}
+  .race .hd .in.called{color:var(--ink);font-weight:900}
+  .race .hd .in.called.D{color:var(--dem-ink)} .race .hd .in.called.R{color:var(--gop-ink)}
+  .race .cands{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cand{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:6px;font-size:16px;font-weight:700}
+  .cand .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .cand .nm small{font-weight:500;color:var(--muted);font-size:12px}
+  .cand .nm.win::after{content:"✓";margin-left:5px}
+  .cand .pct{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+  .cand .trk{grid-column:1/-1;height:8px;background:var(--rule);position:relative}
+  .cand .trk i{position:absolute;left:0;top:0;bottom:0;transition:width .8s}
+  .cand.D .trk i{background:var(--dem)} .cand.R .trk i{background:var(--gop)} .cand.O .trk i{background:var(--oth)}
+  .cand.D .pct{color:var(--dem-ink)} .cand.R .pct{color:var(--gop-ink)}
+  .race.flipD{box-shadow:inset 5px 0 0 var(--dem);padding-left:12px}
+  .rbadge{display:inline-block;background:var(--hl);color:#151412;font-size:11.5px;font-weight:900;padding:3px 6px;vertical-align:middle;margin-left:6px;line-height:1}
+
+  /* ---- odds ---- */
+  .ctl{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .ctl .tile{background:var(--card);color:var(--card-ink);padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 14px;align-items:center}
+  .ctl .tile small{font-size:13px;font-weight:500;opacity:.78;grid-column:1}
+  .ctl .tile b{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1;grid-column:1}
+  .ctl .tile .sp{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+  .ctl .tile .sp svg{display:block}
+  .ctl .tile .sp span{font-size:11.5px;opacity:.8;white-space:nowrap}
+  .row{border-top:2px solid var(--ink);padding:10px 0 12px}
+  .row:first-of-type{border-top:0}
+  .row .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+  .row .where{font-size:19px;font-weight:900;min-width:0}
+  .row .where em{display:block;font-style:normal;font-weight:500;color:var(--muted);font-size:13.5px}
+  .row .right{font-size:14px;font-weight:500;color:var(--muted);text-align:right;white-space:nowrap;flex:none}
+  .odds{display:grid;grid-template-columns:1fr 62px 84px;gap:4px 10px;align-items:baseline}
+  .odds .nm{font-size:16px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .odds .nm.D{color:var(--dem-ink)} .odds .nm.R{color:var(--gop-ink)}
+  .odds .v{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;text-align:right;line-height:1.1;white-space:nowrap}
+  .odds .v small{font-size:11px;font-weight:500;color:var(--muted);margin-left:3px}
+  .odds .v .up{color:var(--dem-ink);font-size:13px} .odds .v .dn{color:var(--gop-ink);font-size:13px}
+  .obar{grid-column:1/-1;height:8px;background:var(--rule);position:relative;margin-top:6px}
+  .obar i{position:absolute;left:0;top:0;bottom:0;background:var(--dem);transition:width .8s}
+  .obar b{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--ink);transform:translateX(-50%)}
+
+  /* ---- poll closings timeline ---- */
+  .tl{position:relative;padding-left:22px;margin-top:4px}
+  .tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--rule)}
+  .wave{position:relative;padding:4px 0 16px}
+  .wave::before{content:"";position:absolute;left:-22px;top:9px;width:12px;height:12px;background:var(--paper);border:3px solid var(--ink);border-radius:50%}
+  .wave.past::before{background:var(--ink)}
+  .wave.now::before{background:var(--hl);border-color:var(--ink)}
+  .wave .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:20px;font-weight:900;line-height:1.2}
+  .wave .t span{font-size:13.5px;font-weight:500;color:var(--muted);text-align:right}
+  .wave.past .t{color:var(--muted)}
+  .wave .sts{font-size:14px;font-weight:700;margin-top:4px;line-height:1.5;letter-spacing:.01em}
+  .wave.past .sts{color:var(--muted);font-weight:500}
+  .wave .l{font-size:14px;font-weight:500;color:var(--muted);margin-top:4px;line-height:1.4}
+  .wave .l b{color:var(--ink);font-weight:700}
+
+  /* ---- vote remaining ---- */
+  .rem .lead{font-size:15px;font-weight:500;color:var(--muted);line-height:1.4}
+  .rem .lead b{font-weight:900;font-size:19px}
+  .rem .need{font-size:14.5px;font-weight:500;color:var(--muted);margin-top:4px;line-height:1.4}
+  .rem .need b{color:var(--ink)}
+
+  /* ---- California ---- */
+  .cabop{margin:14px 0 6px}
+  .cabop .name{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .cabop .name span{font-size:17px;font-weight:900}
+  .cabop .name small{font-size:12.5px;color:var(--muted);font-weight:500}
+  .cabop .bar{height:30px}
+  .cabop .maj span{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;white-space:nowrap;margin-top:4px}
+  .cabop{margin-bottom:28px}
+  .cabop .bar .num{font-size:16px}
+  .props{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  .prop{border-top:2px solid var(--ink);padding:8px 0 10px}
+  .prop .t{display:flex;justify-content:space-between;align-items:baseline;gap:6px;line-height:1.1}
+  .prop .t span:first-child{font-size:15px;font-weight:900;white-space:nowrap}
+  .prop .t span:last-child{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .prop .n{font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px;min-height:32px}
+  .prop .b{height:6px;background:var(--rule);position:relative;margin-top:6px}
+  .prop .b i{position:absolute;left:0;top:0;bottom:0;background:var(--dem)} .prop .b b{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+  @media (min-width:640px){ .props{grid-template-columns:1fr 1fr 1fr} }
+
+  /* ---- calls list ---- */
+  .tgroup{margin-top:14px}
+  .tgroup:first-child{margin-top:4px}
+  .tgroup time{display:block;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink);padding-bottom:4px;border-bottom:2px solid var(--ink);margin-bottom:6px}
+  .call{display:grid;grid-template-columns:30px 1fr auto;gap:0 10px;align-items:center;min-height:44px;padding:6px 0;border-bottom:1px solid var(--rule)}
+  .call .tag{width:30px;height:30px;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff}
+  .call .tag.D{background:var(--dem)} .call .tag.R{background:var(--gop)} .call .tag.O{background:var(--oth)}
+  .call .who{min-width:0;line-height:1.2}
+  .call .who b{display:block;font-size:16px;font-weight:900}
+  .call .who span{display:block;font-size:13.5px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .flip{font-size:11.5px;font-weight:900;background:var(--hl);padding:4px 6px;color:#151412;line-height:1;white-space:nowrap}
+  #morecalls{display:block;width:100%;min-height:44px;margin-top:10px;border:2px solid var(--ink);text-align:center;font-weight:700;font-size:15px;color:var(--ink)}
+  #morecalls:hover{background:var(--ink);color:var(--paper)}
+  #morecalls[hidden]{display:none}
+
+  footer{padding:30px var(--gutter) calc(30px + env(safe-area-inset-bottom));font-size:13px;font-weight:500;color:var(--muted);line-height:1.5;border-top:1px solid var(--rule);margin-top:30px}
+
+  /* ---- state sheet ---- */
+  #sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+  #sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--paper);color:var(--ink);border-top:3px solid var(--ink);max-height:78vh;overflow:auto;padding:14px var(--gutter) calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.9,.3,1),visibility 0s .3s}
+  body.sheet-open{overflow:hidden}
+  body.sheet-open #sheetbg{opacity:1;pointer-events:auto} body.sheet-open #sheet{transform:none;visibility:visible;transition-delay:0s}
+  #sheet .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  #sheet .hd h3{font-size:24px;font-weight:900;letter-spacing:-.01em}
+  #sheet .hd h3 small{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-top:2px}
+  #sheetclose{width:44px;height:44px;display:grid;place-items:center;border:2px solid var(--ink);font-size:22px;font-weight:900;color:var(--ink);line-height:1}
+  @media (min-width:640px){ #sheet{left:50%;right:auto;width:560px;transform:translate(-50%,105%)} body.sheet-open #sheet{transform:translate(-50%,0)} }
+
+  /* ---- toast + confetti ---- */
+  #toast{position:fixed;left:var(--gutter);right:var(--gutter);bottom:calc(18px + env(safe-area-inset-bottom));z-index:50;background:var(--ink);color:var(--paper);padding:12px 16px;font-size:17px;font-weight:900;line-height:1.25;transform:translateY(140%);opacity:0;transition:transform .45s cubic-bezier(.2,1.2,.3,1),opacity .3s;pointer-events:none;box-shadow:0 0 0 3px transparent}
+  #toast.on{transform:none;opacity:1}
+  #toast.D{box-shadow:0 0 0 3px var(--hl)}
+  #toast small{display:block;font-size:13.5px;font-weight:500;opacity:.8;margin-top:3px}
+  #toast .tag{display:inline-block;color:#fff;font-size:12px;padding:3px 7px;margin-right:8px;vertical-align:middle;line-height:1}
+  #toast .tag.D{background:var(--dem)} #toast .tag.R{background:var(--gop)} #toast .tag.O{background:var(--oth)}
+  #toast .hl{background:var(--hl);color:#151412;padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  #confetti{position:fixed;inset:0;z-index:49;pointer-events:none;overflow:hidden}
+  #confetti i{position:absolute;left:50%;top:60%;width:10px;height:7px;will-change:transform,opacity}
+
+  /* ---- tablet / desktop: keep a readable column ---- */
+  @media (min-width:640px){
+    :root{--gutter:24px}
+    main,#next{max-width:720px;margin:0 auto}
+    #top .brand .t{font-size:18px}
+    .legend{grid-template-columns:repeat(6,1fr)}
+    #mapfoot{grid-template-columns:repeat(6,1fr)}
+  }
+  @media (min-width:640px){ #top{justify-content:center} }
+</style>
+</head>
+<body>
+<header id="top"><div id="topin">
+  <div class="brand"><div class="t"><span class="live"><i></i>LIVE</span><span>Election Night<span class="yr"> 2026</span></span></div><div class="status" id="status">Connecting…</div></div>
+  <div class="right"><span class="clock" id="clock">--:--</span><button id="themebtn" type="button" aria-label="Switch to dark mode" title="Switch theme"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button></div>
+</div></header>
+<div id="next"></div>
+
+<main>
+  <section id="hero"><h1 id="headline" aria-live="polite">Waiting for the first results.</h1><div id="sub"></div></section>
+
+  <div class="bops">
+    <div class="bop" id="bopS"><div class="name"><span>Senate</span><small>51 to win · R wins ties</small></div>
+      <div class="bar"><div class="d" style="width:0"></div><div class="dl" style="width:0"></div><div class="rl" style="width:0"></div><div class="r" style="width:0"></div><div class="maj"></div><div class="num d">0</div><div class="num r">0</div></div><div class="foot"></div></div>
+    <div class="bop" id="bopH"><div class="name"><span>House</span><small>218 to win</small></div>
+      <div class="bar"><div class="d" style="width:0"></div><div class="dl" style="width:0"></div><div class="rl" style="width:0"></div><div class="r" style="width:0"></div><div class="maj"></div><div class="num d">0</div><div class="num r">0</div></div><div class="foot"></div></div>
+  </div>
+
+  <section class="s" id="mapsec">
+    <h2><span id="maptitle">Senate map</span><span class="pill" id="mapsub">35 seats</span></h2>
+    <div class="note">Tap a state for its races</div>
+    <div class="seg" id="mapseg" role="group" aria-label="Map"><button type="button" data-o="S" class="on">Senate</button><button type="button" data-o="H">House</button><button type="button" data-o="G">Governors</button></div>
+    <svg id="map" viewBox="0 0 975 610" preserveAspectRatio="xMidYMid meet" role="img" aria-label="United States map of results"></svg>
+    <div class="legend"><span><i style="background:var(--dem)"></i>D win</span><span><i class="lead D"></i>D leads</span><span><i style="background:var(--map-closed)"></i>Closed</span><span><i style="background:var(--gop)"></i>R win</span><span><i class="lead R"></i>R leads</span><span><i style="background:var(--map-open);box-shadow:inset 0 0 0 1px var(--muted)"></i>Open</span></div>
+    <div id="mapfoot"></div>
+  </section>
+
+  <section class="s" id="watch"><h2>Races to watch</h2><div class="note" id="watchnote"></div><div class="body" id="races"><div class="empty">The closest contests appear here as votes come in.</div></div></section>
+  <section class="s" id="odds"><h2>Odds board</h2><div class="note" id="oddsnote">Polymarket</div><div class="body" id="oddsbody"><div class="empty">Polymarket odds load in a moment.</div></div></section>
+  <section class="s" id="closing"><h2>Poll closings</h2><div class="note">all times Pacific · * first polls close; AP waits for the rest of the state</div><div class="body" id="closingbody"><div class="empty">Poll-closing times load with the first results feed.</div></div></section>
+  <section class="s" id="remaining"><h2>Vote remaining</h2><div class="note">share of the remaining two-way vote the trailer needs</div><div class="body" id="rembody"><div class="empty">Shows uncalled races once at least 10% of the expected vote is in: the leader's margin, votes still out, and the share the trailer needs.</div></div></section>
+  <section class="s" id="ca"><h2>California</h2><div class="note" id="canote">Secretary of State returns</div><div class="body" id="cabody"><div class="empty">California returns start after polls close at 8:00 PM PT.</div></div></section>
+  <section class="s" id="props"><h2>California props</h2><div class="note" id="propsnote">yes share · CA Secretary of State</div><div class="body" id="propsbody"><div class="empty">Statewide ballot measures appear once California starts reporting.</div></div></section>
+  <section class="s" id="callsec"><h2><span>Latest calls</span><span class="pill" id="callsub">0 so far</span></h2><div class="note">newest first · grouped by the minute AP called them</div><div class="body" id="calls"><div class="empty">No races called yet.</div></div><button id="morecalls" type="button" hidden>Show all calls</button></section>
+
+  <footer>Results from The Associated Press via The New York Times, updated every 30 seconds (House every 60). Odds from Polymarket. California returns from the Secretary of State. Times in Pacific.</footer>
+</main>
+
+<div id="sheetbg"></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"><div class="hd"><h3 id="sheettitle"></h3><button id="sheetclose" type="button" aria-label="Close">×</button></div><div id="sheetbody"></div></div>
+<div id="confetti" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="feed-worker.js"></script>
+<script>
+/* ===================== GEOMETRY (shared with the TV page via build-mobile.py) ===================== */
+const STATES = {"AL":{"d":"M641.5,383.9L689.2,379.6L702.3,426.8L709.5,439.9L705.9,450.0L708.5,457.1L708.2,464.7L710.7,468.7L660.7,473.9L666.3,486.2L663.6,490.0L658.8,490.9L653.4,481.7L651.5,490.1L646.4,489.4L642.1,455.0L643.6,386.1Z","c":[672,432]},"AK":{"d":"M99.1,569.8L100.1,569.6L102.1,565.8L103.5,565.2L102.8,566.9L105.0,567.4L104.6,569.0L102.5,568.9L100.9,570.4ZM93.3,575.4L95.7,573.1L96.7,573.1L97.8,571.2L98.9,570.6L103.0,570.6L103.1,573.5L104.5,573.3L103.7,574.9L102.0,574.2L102.1,576.1L101.0,575.6L96.7,580.3L97.5,577.1L95.3,579.5ZM44.1,547.4L46.2,547.9L47.1,547.1L49.5,546.6L49.6,547.6L51.1,548.1L50.9,551.2L49.1,551.2L48.3,552.0L44.3,548.6ZM31.2,600.7L33.7,600.4L36.3,598.5L35.3,597.4L37.9,596.4L39.8,597.5L37.9,598.8L40.1,598.1L36.5,600.8L34.7,600.6L32.2,601.5ZM50.7,504.5L56.5,501.8L61.2,500.0L63.8,499.5L65.8,500.1L64.9,502.8L65.2,503.9L68.5,504.1L71.3,505.0L72.5,503.4L74.2,503.6L72.7,502.2L71.4,502.4L71.7,501.1L69.7,498.1L70.7,497.6L71.5,499.0L71.2,500.0L72.6,501.8L73.4,501.6L71.8,499.5L72.7,497.7L72.4,496.9L70.2,497.2L66.5,495.5L66.2,492.2L62.9,487.9L61.4,486.8L60.5,485.4L59.3,484.6L61.0,483.0L61.5,480.7L64.0,481.3L67.1,481.3L69.4,479.9L70.4,478.8L71.6,474.9L73.8,472.3L75.2,471.3L76.8,471.8L78.1,471.3L81.6,468.3L82.9,467.8L83.4,468.5L85.9,468.4L87.3,467.5L89.3,465.0L90.0,465.0L92.5,466.1L92.6,466.7L91.4,467.6L92.2,468.7L93.9,466.2L95.0,467.2L95.1,468.7L96.2,469.2L96.9,468.3L98.6,468.0L101.4,468.7L100.9,470.4L102.8,470.8L102.4,471.7L104.4,472.1L106.0,471.2L106.5,471.7L108.9,470.7L112.0,472.1L112.4,471.8L113.9,472.8L118.9,472.5L121.6,473.8L125.1,471.8L126.0,471.6L131.6,474.2L132.8,474.4L147.2,547.0L149.2,547.3L149.3,546.6L151.3,547.1L152.2,545.7L154.5,545.0L154.5,547.2L156.8,548.2L157.6,549.4L162.3,552.3L163.6,554.7L165.5,552.2L166.5,551.9L166.4,548.3L169.4,545.8L171.6,547.1L172.5,549.2L173.6,549.2L176.3,551.6L178.2,552.1L180.7,553.8L182.2,555.6L188.2,561.5L188.1,562.5L189.5,562.4L189.6,563.9L190.9,564.0L191.5,565.5L192.6,565.0L195.1,565.9L200.0,566.5L200.8,567.3L200.8,569.2L202.9,572.5L202.3,575.8L201.4,577.9L200.0,577.5L198.4,575.0L198.8,573.9L198.0,571.8L198.1,575.0L196.8,575.1L194.5,574.1L194.0,570.6L193.8,574.0L192.2,572.8L192.0,570.8L191.2,571.9L190.2,570.5L189.2,570.4L189.3,568.5L190.1,568.2L188.2,565.3L185.7,563.9L183.2,563.4L182.9,562.0L180.9,559.0L178.2,556.5L176.2,556.7L172.8,552.7L170.8,549.6L170.0,550.1L171.3,551.1L173.3,554.5L174.6,557.6L172.6,556.5L170.8,557.2L170.3,555.3L169.1,554.0L168.6,554.7L165.7,553.7L168.9,555.3L170.2,557.3L168.4,559.2L163.2,557.2L161.7,555.5L160,554.4L152.9,552.1L153.9,551.3L153.2,549.3L150.9,551.3L148.5,551.3L145.5,550.1L140.2,550.1L135.3,551.6L134.6,550.4L132.2,550.2L132.3,548.4L130.8,549.7L128.8,548.6L125.2,550.6L126.0,549.0L128.4,547.7L125.7,547.3L124.4,545.3L123.6,545.5L123.1,544.1L122.1,546.2L121.4,544.7L120.8,546.8L119.1,546.9L120.3,543.9L118.9,544.9L118.4,547.4L119.4,547.5L120.2,549.8L119.6,551.5L121.0,552.8L119.4,554.0L115.2,554.0L114.6,552.8L114.1,556.0L112.9,556.6L111.3,558.7L111.4,557.3L109.7,558.7L108.8,560.3L107.1,560.0L106.4,560.9L104.8,560.2L105.1,558.9L107.5,557.4L108.6,555.9L106.6,557.2L105.1,556.1L105.7,554.0L106.8,552.5L107.3,549.9L106.6,548.5L108.1,547.8L110.5,545.8L112.0,547.1L112.9,545.8L111.9,544.1L109.3,543.8L107.5,545.8L106.3,546.2L104.9,548.4L103.2,550.3L103.5,551.2L102.3,552.6L102.3,553.8L100.4,556.9L98.7,557.3L97.8,558.7L96.1,559.5L95.6,561.3L99.1,562.7L99.1,564.4L97.0,565.6L95.7,569.3L92.5,570.2L92.0,571.4L90.1,572.0L89.3,573.8L87.9,573.7L85.7,575.8L86.6,576.7L85.6,578.2L84.1,578.3L82.7,579.8L82.0,579.0L79.6,581.2L79.7,582.0L77.7,581.8L76.9,582.9L78.5,583.9L76.6,585.8L72.2,586.4L70.8,586.3L67.3,589.0L65.8,588.4L64.0,589.6L62.8,589.4L63.7,587.5L62.6,587.5L60.5,591.2L55.5,591.9L52.7,594.1L49.7,593.9L49.0,594.7L46.7,594.8L46.6,593.2L47.6,592.9L49.2,591.0L53.4,590.7L54.2,592.2L54.5,590.3L56.5,590.1L59.8,586.5L62.0,585.1L66.4,584.5L66.5,585.6L68.9,586.3L67.4,585.0L68.7,582.7L71.2,580.8L75.2,578.7L76.4,579.2L76.6,577.4L77.8,575.8L81.0,573.4L82.3,566.0L84.0,564.4L83.9,563.1L79.6,564.9L77.9,563.3L78.3,561.8L76.7,564.1L77.2,565.8L75.7,566.2L74.6,563.6L73.2,561.9L72.4,563.1L70.9,561.5L71.0,560.6L66.6,562.8L64.7,564.1L64.0,563.2L64.9,560.8L64.1,558.3L65.7,556.7L63.8,551.0L63.1,552.3L60.6,553.1L58.3,553.3L56.6,552.7L56.5,551.1L54.9,548.7L53.4,547.3L54.1,546.8L52.4,546.2L54.4,545.2L53.9,543.3L54.8,542.7L53.8,541.4L52.7,541.9L52.7,540.4L51.0,538.2L52.5,537.2L51.7,535.8L53.4,535.9L53.7,533.6L57.4,529.8L58.7,526.7L61.0,525.7L63.3,527.9L64.2,527.8L67.4,524.8L69.8,525.4L71.4,525.1L73.0,523.1L72.6,519.4L71.5,516.9L72.7,517.3L73.7,515.7L72.5,513.9L71.8,515.0L70.8,514.8L67.6,516.5L66.5,518.0L66.4,516.6L64.0,515.7L61.2,515.4L59.1,516.0L55.2,514.1L54.6,512.8L55.0,511.6L53.8,509.3L54.6,509.7L55.5,508.1L52.6,507.0L50.7,505.1ZM24.8,603.0L26.7,600.8L28.6,600.1L29.2,599.0L30.9,598.6L31.4,600.2L29.1,600.9L27.7,602.2ZM34.4,517.7L35.2,516.0L35.5,516.9L37.6,518.4L39.3,517.8L40.5,518.8L40.4,519.8L41.9,521.1L44.8,522.4L43.9,523.4L42.1,523.0L40.8,524.4L38.9,521.1L36.7,519.4L35.2,519.9L34.4,519.2ZM184.8,573.1L185.5,571.2L184.9,569.8L186.7,569.5L188.6,571.4L190.0,571.7L191.3,573.4L193.2,574.5L191.3,574.2L194.6,576.4L195.6,580.1L193.4,580.2L193.9,579.4L191.8,578.9L189.6,577.5L191.4,579.8L192.0,579.3L192.9,581.2L192.0,581.3L190.1,579.8L189.2,577.8L189.3,576.2L185.8,574.3ZM180.3,567.1L180.7,566.3L182.5,566.4L181.4,565.3L181.9,564.5L185.3,564.2L188.7,566.6L184.3,569.2L183.9,568.5L183.9,572.3L182.6,572.4ZM174.5,555.9L176.6,557.0L178.2,556.8L180.4,560.1L178.7,558.9L181.1,561.7L181.1,563.1L179.5,565.8L178.4,564.5L178.8,563.0ZM173.8,564.7L174.5,562.9L177.2,563.4L179.6,568.3L180.8,572.6L176.7,569.0L175.9,569.0L175.5,565.2ZM169.0,561.4L168.8,560.2L171.5,557.7L173.1,558.5L175.3,558.6L175.5,559.9L177.1,562.6L176.1,563.2L173.7,562.2L173.8,564.7L171.1,563.5ZM120.8,555.0L122.6,552.2L123.5,550.0L124.2,550.9L122.3,553.7Z","c":[103,523]},"AZ":{"d":"M145.0,407.0L148.8,406.9L150.1,400.8L146.9,398.7L148.0,391.6L153.5,385.9L156.3,377.4L162.6,374.5L159.7,369.5L156.8,356.1L159.5,331.3L166.6,331.4L169.9,334.9L172.5,331.4L176,313.2L264.6,327.9L246.8,456.2L208.1,450.4L142.3,411.7Z","c":[208,382]},"CO":{"d":"M277.1,237.1L361.4,246.5L395.3,249.0L393.8,271.8L389.6,340.7L372.5,339.3L303.3,333.0L264.6,327.9Z","c":[332,290]},"FL":{"d":"M710.7,468.7L714.2,474.9L765.7,471.4L769.8,475.4L770.0,464.8L780.1,466.0L786.7,485.6L795.4,500.3L804.6,510.9L806.5,521.8L820.0,544.3L822.7,553.5L823.7,573.7L821.8,573.5L819.7,586.0L806.8,589.7L800.6,577.8L791.8,575.4L786.4,564.2L777.5,556.8L766.0,541.7L771.1,533.2L764.6,529.8L767.3,534.2L761.9,533.9L760.6,526.0L763.6,520.5L761.9,510.1L758.8,505.0L754.9,504.8L746.0,498.3L740.3,490.6L732.1,486.7L727.4,487.4L713.6,500.7L707.4,499.8L706.6,494.4L694.8,487.9L680.6,485.8L663.6,490.0L666.3,486.2L660.7,473.9Z","c":[767,516]},"GA":{"d":"M689.2,379.6L712.7,376.8L734.8,373.6L731.6,381.4L740.7,384.9L748.3,396.1L761.9,405.8L766.0,412.1L771.3,414.4L774.1,422.9L776.8,424.0L781.5,433.4L786.0,434.5L782.5,442.3L781.3,454.4L779.5,456.3L780.1,466.0L770.0,464.8L769.8,475.4L765.7,471.4L714.2,474.9L710.7,468.7L708.2,464.7L708.5,457.1L705.9,450.0L709.5,439.9L702.3,426.8Z","c":[736,428]},"IN":{"d":"M640.3,229.8L645.5,231.2L651.9,227.5L685.6,223.9L685.8,225.3L692.5,284.2L693.5,291.3L682.5,294.5L683.6,298.3L677.0,305.1L676.0,311.0L669.9,310.9L665.9,314.3L660.7,313.4L655.3,318.6L646.5,315.1L639.3,319.7L637.9,317.5L646.8,297.3L643.4,287.9L645.0,283.6Z","c":[665,269]},"KS":{"d":"M393.8,271.8L509.9,275.2L517.3,279.1L513.5,285.8L518.3,293.0L522.2,295.2L522.7,343.8L422.6,342.2L389.6,340.7Z","c":[456,309]},"ME":{"d":"M910.1,150.1L903.7,144.3L902.8,140.0L890.8,102.3L894.8,103.1L895.2,96.2L900.0,86.1L898.1,76.3L899.1,67.5L905.8,47.6L908.8,47.5L912.4,52.3L921.2,45.5L929.7,49.7L938.7,79.8L944.5,79.8L946.1,87.0L951.9,88.0L957.0,94.7L952.7,98.6L950.1,105.5L946.7,104.2L943.8,110.3L937.0,114.0L937.3,119.8L931.9,114.3L931.0,110.0L928.2,124.7L918.0,130.9L912.8,138.1Z","c":[919,93]},"MA":{"d":"M871.0,167.6L884.0,164.8L902.9,160.6L909.4,154.7L914.3,158.4L909.4,165.7L917.0,171.2L920.2,176.8L930.9,176.7L920.0,183.3L919.5,179.4L912.7,186.3L910.5,182.7L909.8,182.1L905.4,176.0L898.7,178.0L871.1,183.9Z","c":[897,172]},"MN":{"d":"M479.5,70.6L510.7,70.7L510.6,62.1L515.6,64.1L518.5,76.4L530.8,78.8L531.5,81.2L538.2,78.6L543.7,78.5L551.0,82.2L553.4,87.2L554.9,84.1L563.3,87.3L565.7,90.7L575.9,85.6L578.0,88.8L587.6,87.9L596.2,90.0L590.4,94.1L581.9,97.5L573.2,104.8L568.1,111.3L558.9,119.3L560.2,121.1L555.9,122.3L556.4,135.6L549.9,139.9L547.4,147.1L551.4,150.1L549.6,153.6L549.3,165.5L553.7,169.9L563.9,174.8L564.8,177.8L574.9,185.6L576.3,193.2L490.5,195.2L490.7,154.2L484.3,147.3L489.0,139.8L488.5,130.9L485.5,123.3L484.8,101.9L480.7,90.0L481.4,77.7Z","c":[525,132]},"NJ":{"d":"M849.1,245.8L849.7,244.3L850.7,241.4L860.6,230.9L853.7,226.3L849.8,220.7L849.6,214.2L854.9,204.0L869.8,209.0L869.1,216.4L868.9,217.1L866.5,221.4L872.1,223.2L873.1,237.2L870.8,245.5L862.5,259.0L862.9,253.8L850.4,249.5L849.3,246.3Z","c":[861,230]},"NC":{"d":"M755.5,333.9L780.3,331.0L858.8,315.9L855.9,317.4L859.2,322.9L847.4,332.7L862.7,328.9L865.1,337.3L859.7,344.3L843.0,343.4L854.2,347.0L850.4,355.8L855.7,351.5L859.0,353.6L856.1,362.4L853.0,360.5L846.7,362.6L838.3,369.9L834.4,376.6L833.3,384.0L822.7,386.1L798.1,368.4L777.6,371.4L772.0,364.7L749.1,367.0L734.8,373.6L712.7,376.8L712.6,371.3L717.3,369.0L721.0,362.5L726.2,361.7L747.3,345.1L750.7,345.2Z","c":[801,351]},"ND":{"d":"M376.8,65.6L479.5,70.6L481.4,77.7L480.7,90.0L484.8,101.9L485.5,123.3L488.5,130.9L489.0,139.8L371.0,134.3Z","c":[429,103]},"OK":{"d":"M372.5,339.3L389.6,340.7L422.6,342.2L522.7,343.8L522.9,355.2L526.7,380.5L526.4,420.6L519.1,418.3L512.4,413.4L501.1,416.4L495.2,416.3L492.0,419.6L481.1,413.7L476.2,418.7L475.3,414.4L470.9,416.4L466.4,412.6L461.6,412.5L453.9,408.5L451.6,410.6L438.3,403.9L429.1,402.4L423.9,398.2L425.7,353.9L371.5,350.7Z","c":[471,376]},"PA":{"d":"M756.1,208.9L767.4,200.2L768.6,206.3L840.8,192.1L845.7,194.7L847.4,199.8L854.9,204.0L849.6,214.2L849.8,220.7L853.7,226.3L860.6,230.9L850.7,241.4L844.8,244.6L782.2,256.8L764.4,259.8L761.0,239.1Z","c":[806,225]},"SD":{"d":"M369.0,155.7L371.0,134.3L489.0,139.8L484.3,147.3L490.7,154.2L490.5,195.2L487.5,213.3L490.6,218.2L486.6,214.5L476.3,209.5L467.4,209.3L464.6,211.7L456.7,206.1L365.3,201.0Z","c":[430,172]},"TX":{"d":"M371.5,350.7L425.7,353.9L423.9,398.2L429.1,402.4L438.3,403.9L451.6,410.6L453.9,408.5L461.6,412.5L466.4,412.6L470.9,416.4L475.3,414.4L476.2,418.7L481.1,413.7L492.0,419.6L495.2,416.3L501.1,416.4L512.4,413.4L519.1,418.3L526.4,420.6L534.7,422.5L534.7,422.5L535.0,434.6L535.5,458.1L545.7,476.2L545.5,484.4L541.7,495.7L543.1,501.8L538.8,507.5L540.6,510.3L534.7,511.4L522.0,517.8L523.7,509.1L517.5,511.4L519.9,519.3L523.1,518.8L510.2,529.5L493.6,538.0L477.8,551.1L479.5,546.9L489.2,541.3L482.1,540.4L481.9,544.0L473.6,547.2L477.4,548.0L469.4,564.2L468.1,575.8L469.1,583.2L474.4,595.1L469.7,597.6L461.0,592.5L452.8,592.4L447.4,588.5L434.2,583.4L431.4,574.1L427.9,569.9L427.5,559.3L419.8,552.1L418.9,547.9L412.0,540.7L405.3,521.9L390.3,505.7L379.0,504.9L374.2,502.4L367.2,505.3L361.6,516.8L356.7,521.5L337.1,510.9L330.5,504.5L327.7,497.7L327.7,490.6L322.9,479.9L315.7,475.3L306.2,462.7L301.6,459.9L296.2,452.0L295.1,446.9L362.8,453.2L366.5,409.0L370.8,350.7Z","c":[434,469]},"WY":{"d":"M369.0,155.7L365.3,201.0L361.4,246.5L277.1,237.1L243.5,232.2L247.1,209.5L256.0,153.8L257.8,142.0Z","c":[308,195]},"CT":{"d":"M871.1,183.9L898.7,178.0L901.7,193.5L885.1,199.5L874.0,208.3L874.1,200.9Z","c":[886,191]},"MO":{"d":"M502.0,261.8L522.0,262.0L570.9,259.5L576.4,264.7L575.5,272.5L578.0,279.4L589.8,290.2L591.2,297.1L600.9,298.4L597.6,313.2L613.2,324.1L613.7,333.4L618.3,339.9L621.2,339.9L621.2,347.1L616.8,351.3L615.6,351.4L614.6,351.5L615.0,356.5L611.8,363.1L600.2,363.9L605.1,357.3L603.6,352.2L522.9,355.2L522.7,343.8L522.2,295.2L518.3,293.0L513.5,285.8L517.3,279.1L509.9,275.2Z","c":[560,312]},"WV":{"d":"M733.2,294.7L737.8,293.4L738.5,285.3L741.0,279.6L743.9,282.7L745.2,275.4L749.4,269.6L753.8,269.2L759.2,260.9L760.9,246.5L758.8,241.0L761.0,239.1L764.4,259.8L782.2,256.8L784.1,268.5L794.5,256.9L800.3,258.3L804.3,253.4L809.9,255.5L813.8,260.3L812.8,264.9L802.6,259.1L802.8,266.0L796.5,276.6L794.0,275.0L790.3,285.9L783.7,282.8L783.7,286.6L775.9,305.1L776.6,309.2L761.2,318.0L758.5,316.1L753.4,320.0L747.1,313.2L740.9,311.0L733.3,301.3Z","c":[767,285]},"IL":{"d":"M576.4,264.7L577.2,259.5L581.2,257.7L583.6,247.8L581.6,240.6L593.2,236.0L595.6,230.8L595.5,223.8L587.0,215.3L634.1,212.3L633.9,216.7L640.3,229.8L645.0,283.6L643.4,287.9L646.8,297.3L637.9,317.5L639.3,319.7L639.0,327.2L632.1,329.8L633.0,336.9L624.6,334.1L621.2,339.9L618.3,339.9L613.7,333.4L613.2,324.1L597.6,313.2L600.9,298.4L591.2,297.1L589.8,290.2L578.0,279.4L575.5,272.5Z","c":[615,270]},"NM":{"d":"M264.6,327.9L303.3,333.0L372.5,339.3L371.5,350.7L370.8,350.7L366.5,409.0L362.8,453.2L295.1,446.9L296.2,452.0L264.2,448.2L262.9,458.3L246.8,456.2Z","c":[311,393]},"AR":{"d":"M522.9,355.2L603.6,352.2L605.1,357.3L600.2,363.9L611.8,363.1L613.4,365.6L608.1,369.7L610.2,371.5L604.8,376.8L607.1,383.2L602.8,386.7L599.3,391.3L598.8,400.0L595.5,401.5L593.6,408.3L589.7,411.2L591.7,414.9L587.5,420.4L589.6,422.3L589.3,433.0L535.0,434.6L534.7,422.5L534.7,422.5L526.4,420.6L526.7,380.5Z","c":[564,391]},"CA":{"d":"M32.5,159.9L49.7,164.8L100.4,179.1L100.4,179.1L83.3,245.5L112.0,288.8L133.8,321.5L156.8,356.1L159.7,369.5L162.6,374.5L156.3,377.4L153.5,385.9L148.0,391.6L146.9,398.7L150.1,400.8L148.8,406.9L145.0,407.0L99.5,401.6L97.9,398.1L98.7,387.7L96.5,382.2L86.5,369.8L82.0,369.2L81.3,362.1L76.3,361.7L69.6,356.7L65.0,349.2L48.7,344.2L46.4,340.4L49.8,328.5L42.0,313.8L35.0,292.2L39.6,285.9L31.4,274.2L33.2,260.8L38.5,270.1L35.8,257.2L33.2,259.9L26.2,253.4L28.5,248.2L20.1,228.9L24.0,209.1L18.4,197.1L18.9,193.0L25.4,185.3L31.2,172.9Z","c":[82,288]},"DE":{"d":"M844.8,244.6L850.7,241.4L849.7,244.3L849.5,249.7L854.6,257.8L861.1,262.5L863.6,270.2L852.5,272.5Z","c":[854,261]},"DC":{"d":"","c":[827,268]},"HI":{"d":"M305.4,584.4L310.3,578.0L309.2,572.6L321.9,578.0L332.2,589.3L328.5,593.2L317.1,598.2L313.7,603.1L309.1,600.4L309.0,593.4ZM291.6,557.9L299.6,557.2L306.4,560.7L305.2,563.9L297.2,565.1ZM278.6,553.8L279.6,551.1L291.3,552.5L287.8,555.0ZM258.0,543.0L264.6,540.0L271.3,549.3L261.5,549.2ZM226.0,532.6L230.4,528.3L236.5,531.0L235.4,534.8L229.9,535.7Z","c":[302,574]},"IA":{"d":"M490.5,195.2L576.3,193.2L579.2,198.8L577.4,201.6L579.8,210.5L587.0,215.3L595.5,223.8L595.6,230.8L593.2,236.0L581.6,240.6L583.6,247.8L581.2,257.7L577.2,259.5L576.4,264.7L570.9,259.5L522.0,262.0L502.0,261.8L499.1,241.7L496.4,240.2L496.9,234.0L493.4,228.4L490.6,218.2L487.5,213.3Z","c":[540,227]},"KY":{"d":"M621.2,339.9L624.6,334.1L633.0,336.9L632.1,329.8L639.0,327.2L639.3,319.7L646.5,315.1L655.3,318.6L660.7,313.4L665.9,314.3L669.9,310.9L676.0,311.0L677.0,305.1L683.6,298.3L682.5,294.5L693.5,291.3L692.5,284.2L699.0,283.3L703.8,289.8L713.9,292.6L720.2,292.4L726.9,287.9L733.2,294.7L733.3,301.3L740.9,311.0L747.1,313.2L741.1,320.4L735.1,324.7L728.9,334.2L719.7,338.7L687.2,342.3L667.4,343.5L644.7,346.0L641.4,349.5L616.8,351.3L621.2,347.1Z","c":[688,321]},"MD":{"d":"M782.2,256.8L844.8,244.6L852.5,272.5L863.6,270.2L862.5,280.4L855.5,283.8L851.7,285.4L851.1,278.6L845.4,279.1L841.3,274.1L846.3,271.3L839.0,266.2L840.0,255.0L836.2,258.7L838.0,273.7L841.1,281.9L834.5,281.5L829.8,277.6L826.9,280.2L827.0,273.7L827.9,269.9L825.9,266.9L818.1,264.1L813.8,260.3L809.9,255.5L804.3,253.4L800.3,258.3L794.5,256.9L784.1,268.5Z","c":[831,263]},"MI":{"d":"M651.9,227.5L655.0,224.1L659.7,211.0L658.9,198.0L652.3,183.9L651.9,175.0L655.2,167.9L654.5,160.1L661.1,153.5L663.5,147.8L664.9,157.3L667.7,153.2L667.3,145.5L674.1,141.9L670.4,138.1L675.3,132.7L684.5,135.1L687.4,138.0L696.7,139.9L701.3,146.9L698.8,149.1L702.1,153.9L702.4,162.4L699.2,169.4L695.4,171.4L694.0,177.1L698.9,180.1L704.6,170.6L709.9,167.6L715.0,171.9L721.2,190.5L720.9,199.7L715.9,200.0L711.8,214.9L708.2,221.7L685.8,225.3L685.6,223.9ZM601.4,92.3L610.0,85.8L610.1,88.6L603.4,93.3ZM585.3,123.0L594.7,116.7L600.2,115.9L618.6,100.5L625.8,101.1L618.3,106.4L615.4,111.7L615.5,116.5L618.5,112.4L627.6,113.8L632.6,120.4L645.3,120.6L651.8,115.2L662.0,113.9L670.0,111.0L669.6,117.5L676.4,118.3L681.9,114.9L685.4,124.4L688.9,126.3L693.1,123.6L694.0,127.5L685.2,127.2L681.2,128.7L676.5,126.5L674.2,130.9L671,128.1L662.9,127.1L660.9,130.3L652.5,131.2L650.3,135.4L645.0,138.7L647.5,134.3L639.9,135.3L632.3,153.0L627.7,147.8L627.7,147.8L628.2,140.2L622.3,137.4L622.6,135.0L611.7,133.7L606.7,131.3L590.2,127.9L586.3,123.6L586.3,123.6Z","c":[669,167]},"MS":{"d":"M589.3,433.0L589.6,422.3L587.5,420.4L591.7,414.9L589.7,411.2L593.6,408.3L595.5,401.5L598.8,400.0L599.3,391.3L602.8,386.7L641.5,383.9L643.6,386.1L642.1,455.0L646.4,489.4L636.6,489.7L624.7,495.4L617.6,484.9L619.0,477.0L582.5,479.1L584.2,467.1L594.9,447.9L591.0,445.0L591.3,435.6Z","c":[618,437]},"MT":{"d":"M198.0,39.0L376.8,65.6L371.0,134.3L369.0,155.7L257.8,142.0L256.0,153.8L251.6,146.7L249.5,151.3L236.6,148.4L234.6,150.9L224.8,149.1L224.0,141.5L219.3,138.5L220.2,134.2L216.8,127.3L216.9,121.0L214.5,118.2L207.8,122.6L205.1,119.7L205.8,114.9L213.2,97.0L204.8,89.6L200.8,79.7L195.6,74.7L196.8,68.7L193.2,61.5Z","c":[287,98]},"NH":{"d":"M886.1,110.5L886.7,104.9L890.8,102.3L902.8,140.0L903.7,144.3L910.1,150.1L909.4,154.7L902.9,160.6L884.0,164.8L880.5,145.7L883.1,132.9L881.8,127.9L887.9,122.0L885.7,116.8Z","c":[893,140]},"NY":{"d":"M767.4,200.2L776.4,192.1L780.3,186.0L774.8,175.9L783.7,171.7L796.5,170.4L799.7,171.9L809.0,169.2L816.4,161.8L819.3,161.0L818.9,151.7L814.7,150.3L814.9,146.3L820.5,141.2L827.7,128.8L834.3,123.1L857.5,117.8L858.8,126.2L861.4,130.2L861.2,139.5L866.8,149.6L871.0,167.6L871.1,183.9L874.1,200.9L874.0,208.3L890.9,204.2L894.6,199.5L899.6,201.8L883.3,214.3L871.6,219.2L869.1,216.4L869.8,209.0L854.9,204.0L847.4,199.8L845.7,194.7L840.8,192.1L768.6,206.3Z","c":[834,172]},"OH":{"d":"M685.8,225.3L708.2,221.7L717.6,225.4L719.0,223.5L725.6,227.4L733.0,223.2L737.6,223.1L748.4,213.0L756.1,208.9L761.0,239.1L758.8,241.0L760.9,246.5L759.2,260.9L753.8,269.2L749.4,269.6L745.2,275.4L743.9,282.7L741.0,279.6L738.5,285.3L737.8,293.4L733.2,294.7L726.9,287.9L720.2,292.4L713.9,292.6L703.8,289.8L699.0,283.3L692.5,284.2Z","c":[724,253]},"OR":{"d":"M70.9,70.2L77.0,73.7L80.1,79.9L78.9,86.8L85.8,91.4L98.2,90.6L102.8,94.6L113.1,94.3L136.2,95.7L138.7,94.7L170.5,102.3L175.5,112.5L166.7,124.1L164.3,129.0L158.1,134.7L157.2,139.1L161.7,142.6L157.9,150.4L148.8,190.7L100.4,179.1L100.4,179.1L100.4,179.1L49.7,164.8L32.5,159.9L31.1,157.2L33.5,146.6L32.8,139.8L43.8,123.5L57.1,92.4L64.9,70.5Z","c":[103,134]},"TN":{"d":"M611.8,363.1L615.0,356.5L614.6,351.5L615.6,351.4L616.8,351.3L641.4,349.5L644.7,346.0L667.4,343.5L687.2,342.3L719.7,338.7L755.5,333.9L750.7,345.2L747.3,345.1L726.2,361.7L721.0,362.5L717.3,369.0L712.6,371.3L712.7,376.8L689.2,379.6L641.5,383.9L602.8,386.7L607.1,383.2L604.8,376.8L610.2,371.5L608.1,369.7L613.4,365.6Z","c":[674,361]},"UT":{"d":"M197.7,201.0L247.1,209.5L243.5,232.2L277.1,237.1L264.6,327.9L176,313.2Z","c":[227,269]},"VA":{"d":"M855.5,283.8L862.5,280.4L858.3,288.2L856.4,301.8L852.6,300.6L852.7,292.6ZM747.1,313.2L753.4,320.0L758.5,316.1L761.2,318.0L776.6,309.2L775.9,305.1L783.7,286.6L783.7,282.8L790.3,285.9L794.0,275.0L796.5,276.6L802.8,266.0L802.6,259.1L812.8,264.9L813.8,260.3L818.1,264.1L825.9,266.9L827.9,269.9L827.0,273.7L826.0,281.0L830.3,279.1L831.8,282.6L838.1,282.8L845.9,287.3L845.1,298.8L849.1,305.4L846.3,310.4L854.7,308.0L858.8,315.9L780.3,331.0L755.5,333.9L719.7,338.7L728.9,334.2L735.1,324.7L741.1,320.4Z","c":[802,304]},"WA":{"d":"M183.6,35.9L170.6,92.8L170.5,102.3L138.7,94.7L136.2,95.7L113.1,94.3L102.8,94.6L98.2,90.6L85.8,91.4L78.9,86.8L80.1,79.9L77.0,73.7L70.9,70.2L62.9,67.6L69.6,59.0L65.9,57.2L66.8,51.0L67.1,32.3L65.9,23.7L68.5,19.2L76.9,27.1L90.1,33.0L94.6,32.8L94.7,38.4L88.0,44.0L96.6,39.0L96.3,42.6L91.2,53.6L96.1,51.9L97.9,41.7L101.7,37.5L98.6,31.5L101.2,31.4L102.3,20.9L99.3,19.1L100.0,14.3Z","c":[124,59]},"WI":{"d":"M560.2,121.1L568.0,119.6L576.2,115.0L579.7,116.0L576.9,122.8L580.2,120.4L585.3,123.0L586.3,123.6L586.3,123.6L590.2,127.9L606.7,131.3L611.7,133.7L622.6,135.0L622.3,137.4L628.2,140.2L627.7,147.8L627.7,147.8L632.3,153.0L626.8,162.0L627.3,166.3L635.7,157.0L640.4,147.7L641.0,152.3L635.4,165.1L635.3,173.6L632.4,180.7L633.3,185.2L630.8,195.6L634.1,212.3L587.0,215.3L579.8,210.5L577.4,201.6L579.2,198.8L576.3,193.2L574.9,185.6L564.8,177.8L563.9,174.8L553.7,169.9L549.3,165.5L549.6,153.6L551.4,150.1L547.4,147.1L549.9,139.9L556.4,135.6L555.9,122.3Z","c":[595,167]},"NE":{"d":"M365.3,201.0L456.7,206.1L464.6,211.7L467.4,209.3L476.3,209.5L486.6,214.5L490.6,218.2L493.4,228.4L496.9,234.0L496.4,240.2L499.1,241.7L502.0,261.8L509.9,275.2L393.8,271.8L395.3,249.0L361.4,246.5Z","c":[434,238]},"SC":{"d":"M734.8,373.6L749.1,367.0L772.0,364.7L777.6,371.4L798.1,368.4L822.7,386.1L814.2,396.2L811.0,407.8L800.6,418.9L792.1,423.7L793.1,426.6L786.0,434.5L781.5,433.4L776.8,424.0L774.1,422.9L771.3,414.4L766.0,412.1L761.9,405.8L748.3,396.1L740.7,384.9L731.6,381.4Z","c":[780,393]},"ID":{"d":"M170.5,102.3L170.6,92.8L183.6,35.9L198.0,39.0L193.2,61.5L196.8,68.7L195.6,74.7L200.8,79.7L204.8,89.6L213.2,97.0L205.8,114.9L205.1,119.7L207.8,122.6L214.5,118.2L216.9,121.0L216.8,127.3L220.2,134.2L219.3,138.5L224.0,141.5L224.8,149.1L234.6,150.9L236.6,148.4L249.5,151.3L251.6,146.7L256.0,153.8L247.1,209.5L197.7,201.0L148.8,190.7L157.9,150.4L161.7,142.6L157.2,139.1L158.1,134.7L164.3,129.0L166.7,124.1L175.5,112.5Z","c":[199,147]},"NV":{"d":"M100.4,179.1L100.4,179.1L148.8,190.7L197.7,201.0L176,313.2L172.5,331.4L169.9,334.9L166.6,331.4L159.5,331.3L156.8,356.1L133.8,321.5L112.0,288.8L83.3,245.5Z","c":[142,252]},"VT":{"d":"M857.5,117.8L886.1,110.5L885.7,116.8L887.9,122.0L881.8,127.9L883.1,132.9L880.5,145.7L884.0,164.8L871.0,167.6L866.8,149.6L861.2,139.5L861.4,130.2L858.8,126.2Z","c":[873,136]},"LA":{"d":"M535.0,434.6L589.3,433.0L591.3,435.6L591.0,445.0L594.9,447.9L584.2,467.1L582.5,479.1L619.0,477.0L617.6,484.9L624.7,495.4L619.2,498.9L622.6,502.7L625.7,497.6L628.2,501.2L627.3,507.1L622.7,507.7L626.2,513.3L632.4,513.8L634.1,521.8L619.8,515.3L612.6,521.1L608.1,515.4L601.0,522.7L590.3,517.4L584.1,507.8L578.8,505.8L570.6,513.0L553.5,508.2L540.6,510.3L538.8,507.5L543.1,501.8L541.7,495.7L545.5,484.4L545.7,476.2L535.5,458.1Z","c":[576,478]},"RI":{"d":"M901.7,193.5L898.7,178.0L905.4,176.0L909.8,182.1L906.7,181.2L907.6,190.7Z","c":[904,184]}};
+const NE = ['VT','NH','MA','RI','CT','NJ','DE','MD','DC'];
+const NAMES = {AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'D.C.',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming'};
+
+/* ===================== CONFIG (same feeds, cadence and AP rules as index.html) ===================== */
+const BASE = 'https://static01.nyt.com/elections-assets/pages/data/2026-11-03/';
+const FILES = {S:'results-senate.json', G:'results-governor.json', H:'results-house.json'};
+const POLL_MS = 30000;
+const FEED_MS = {S:30000, G:30000, H:60000};
+const TZ = 'America/Los_Angeles';
+const DEMO = location.hash.includes('demo');
+// AP does not call a statewide race until the LAST polls in the state close. The feed gives the FIRST closing for split-zone states; AP's last-close times (Pacific) per AP Decision Notes:
+const LAST_CLOSE_PT = {KY:'16:00', IN:'16:00', FL:'17:00', NH:'17:00', TX:'18:00', MI:'18:00', KS:'18:00', ND:'18:00', ID:'20:00'};
+const ptDate = hhmm => new Date(`2026-11-03T${hhmm}:00-08:00`);
+
+/* ===================== STATE ===================== */
+let data = {S:null,G:null,H:null};
+let races = [];
+let polls = {}, pollsLast = {}, pollsFirst = {};
+let seen = DEMO ? {} : loadSeen();
+const callSeenAt = {};
+const feedSeen = {S:false,G:false,H:false};
+let lastOk = 0;
+let mapOffice = 'S';
+function loadSeen(){ try{ return JSON.parse(localStorage.getItem('en26seen')||'{}'); }catch(e){ return {}; } }
+function saveSeen(){ try{ localStorage.setItem('en26seen', JSON.stringify(seen)); }catch(e){} }
+
+/* ===================== FETCH + NORMALIZE (feed-worker.js does the parsing; same worker/in-page fallback as the TV page) ===================== */
+const withTimeout = ms => { try{ return AbortSignal.timeout(ms); }catch(e){ const c = new AbortController(); setTimeout(()=>c.abort(), ms); return c.signal; } };
+const nextDue = {S:0, G:0, H:0};
+const feedState = {S:{}, G:{}, H:{}};
+const racesBy = {S:[], G:[], H:[]};
+const normDirty = {S:false, G:false, H:false};
+let feedMode = 'page', feedWorker = null, workerSeq = 0; const workerPending = new Map();
+const WORKER_TIMEOUT_MS = 25000;
+function killWorker(why){
+  if(feedMode==='worker') console.warn('feed worker dropped, using in-page fetch:', why);
+  if(feedWorker){ try{ feedWorker.terminate(); }catch(e){} }
+  feedWorker = null; feedMode = 'page';
+  for (const p of workerPending.values()) p.reject(new Error(why)); workerPending.clear();
+}
+function startWorker(){
+  if(DEMO || typeof Worker==='undefined' || typeof FEED==='undefined') return;
+  try{
+    const w = new Worker('feed-worker.js');
+    w.onerror = e => { killWorker(e && e.message || 'error'); try{ e.preventDefault(); }catch(x){} };
+    w.onmessage = e => { const m = e.data||{}; const p = workerPending.get(m.id); if(p){ workerPending.delete(m.id); p.resolve(m); } };
+    w.postMessage({type:'init', NAMES});
+    feedWorker = w; feedMode = 'worker';
+  }catch(e){ feedWorker = null; feedMode = 'page'; console.debug('feed worker unavailable (expected on file://), using in-page fetch:', e.message); }
+}
+function workerFetch(k){
+  return new Promise((resolve, reject)=>{
+    const id = ++workerSeq;
+    const timer = setTimeout(()=>{ if(workerPending.has(id)){ workerPending.delete(id); killWorker('timeout'); reject(new Error('worker timeout')); } }, WORKER_TIMEOUT_MS);
+    workerPending.set(id, { resolve: m=>{ clearTimeout(timer); resolve(m); }, reject: e=>{ clearTimeout(timer); reject(e); } });
+    try{ feedWorker.postMessage({type:'fetch', id, office:k, url:BASE+FILES[k], timeout:20000}); }
+    catch(e){ clearTimeout(timer); workerPending.delete(id); killWorker(e.message); reject(e); }
+  });
+}
+async function fetchAll(offices){
+  const out = {};
+  await Promise.all((offices||Object.keys(FILES)).map(async k=>{
+    if(feedMode==='worker'){
+      try{ const m = await workerFetch(k); if(m.ok){ out[k] = m.changed? {changed:true, races:m.races, meta:m.meta} : {changed:false}; } else { out[k] = null; console.warn('fetch failed', k, m.error); } return; }
+      catch(e){ /* worker died: fall through to the in-page fetch */ }
+    }
+    try{ const r = await FEED.fetchFeed(BASE+FILES[k], feedState[k], 20000); out[k] = r.status==='changed'? {changed:true, json:r.json} : {changed:false}; }
+    catch(e){ out[k] = null; console.warn('fetch failed', k, e); }
+  }));
+  return out;
+}
+function normalize(){
+  for (const office of ['S','G','H']){
+    if(!normDirty[office]) continue; normDirty[office] = false;
+    const j = data[office];
+    if(j && j.races) racesBy[office] = FEED.normalizeOffice(office, j, {NAMES, callSeenAt});
+    else if(!j) racesBy[office] = [];
+  }
+  races = [].concat(racesBy.S, racesBy.G, racesBy.H);
+  const pc = (data.S||data.G||data.H)?.pollClosingTimes||[];
+  polls = {}; pollsLast = {}; pollsFirst = {}; for (const p of pc){ const st=p.reporting_unit?.state_postal; if(!st) continue; const d = new Date(p.poll_closing_time); const last = LAST_CLOSE_PT[st]? ptDate(LAST_CLOSE_PT[st]) : d; polls[st] = d; pollsLast[st] = last; pollsFirst[st] = last > d; }
+}
+function control(office){
+  const j = data[office==='H'?'H':'S']; const o = j?.partyControlData?.results?.[0]?.offices?.[office]; if(!o) return null;
+  const pb = o.party_balance||{};
+  return { total:o.total, toWin:o.to_win||{}, dem:pb.DEM?.seats||0, gop:pb.GOP?.seats||0, oth:pb.OTH?.seats||0,
+    demFlips:pb.DEM?.flip_count||0, gopFlips:pb.GOP?.flip_count||0, winner: pb.DEM?.winner?'D':pb.GOP?.winner?'R':null,
+    called:o.num_races_called||0, open:o.open_seats||0, cur:o.current_control||{} };
+}
+
+/* ===================== RENDER ===================== */
+const $ = s=>document.querySelector(s);
+const fmtPT = (d,opts)=>new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit',...opts}).format(d);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pcol = p=>p==='D'?'var(--dem-ink)':p==='R'?'var(--gop-ink)':'var(--ink)';
+
+function renderClock(){
+  const now = new Date();
+  $('#clock').innerHTML = fmtPT(now) + '<small>PT</small>';
+  const groups = {};
+  for (const [st,d] of Object.entries(polls)){ if(d>now){ const k=d.getTime(); (groups[k]=groups[k]||[]).push(st); } }
+  const keys = Object.keys(groups).map(Number).sort((a,b)=>a-b);
+  if(lastOk){ const ago = Math.max(0, Math.round((now-lastOk)/1000)); const el=$('#status'); el.textContent = ago<90? `Updated ${ago}s ago` : `Reconnecting… last update ${Math.round(ago/60)} min ago`; el.classList.toggle('err', ago>=90); }
+  if(!keys.length){ $('#next').innerHTML = Object.keys(polls).length? 'All polls have closed.' : ''; return; }
+  const t = keys[0], sts = groups[t].sort(); const ms = t-now;
+  const h = Math.floor(ms/3.6e6), m = Math.floor(ms%3.6e6/6e4), s = Math.floor(ms%6e4/1e3);
+  const cd = h? `${h}h ${String(m).padStart(2,'0')}m` : `${m}:${String(s).padStart(2,'0')}`;
+  const names = sts.map(x=>NAMES[x]||x); const big = sts.length>3; const list = big ? `${sts.length} states` : names.join(sts.length===3?', ':' and ');
+  const closedN = Object.values(pollsLast).filter(d=>d<=now).length;
+  const firstOnly = sts.every(x=>pollsFirst[x]);
+  $('#next').innerHTML = `${firstOnly? 'Polls begin closing' : 'Next poll closing'}: <b>${list}</b> at ${fmtPT(new Date(t))} PT, in <b class="tnum">${cd}</b><small>${big? sts.join(' · ')+' · ' : ''}${closedN} of ${Object.keys(polls).length} states fully closed</small>`;
+}
+
+function renderBop(id, c, office){
+  if(!c) return;
+  const bar = document.querySelector(`#${id} .bar`);
+  const total = c.total; const pct = n=>Math.max(0,n/total*100);
+  const lead = {D:0,R:0};
+  for (const r of races) if(r.office===office && !r.called && r.total>0 && r.cands[0]) { const p=r.cands[0].party; if(lead[p]!==undefined) lead[p]++; }
+  bar.querySelector('.d').style.width = pct(c.dem)+'%';
+  bar.querySelector('.r').style.width = pct(c.gop)+'%';
+  bar.querySelector('.dl').style.width = pct(lead.D)+'%';  bar.querySelector('.dl').style.left = pct(c.dem)+'%';
+  bar.querySelector('.rl').style.width = pct(lead.R)+'%';  bar.querySelector('.rl').style.right = pct(c.gop)+'%';
+  const dn = bar.querySelector('.num.d'), rn = bar.querySelector('.num.r');
+  dn.innerHTML = `${c.dem}<small>DEM</small>`; rn.innerHTML = `<small>GOP</small>${c.gop}`;
+  const smallD = c.dem/total<=0.08, smallR = c.gop/total<=0.08;
+  dn.style.left = smallD? pct(c.dem)+'%' : '10px'; dn.style.background = smallD? 'var(--dem)':'none'; dn.style.padding = smallD? '0 10px':'0';
+  rn.style.right = smallR? pct(c.gop)+'%' : '10px'; rn.style.background = smallR? 'var(--gop)':'none'; rn.style.padding = smallR? '0 10px':'0';
+  const maj = bar.querySelector('.maj'); const need = office==='S'? 50.5 : 218; maj.style.left = (need/total*100)+'%';
+  const small = document.querySelector(`#${id} .name small`), foot = document.querySelector(`#${id} .foot`);
+  if(c.winner) small.innerHTML = `<b style="color:${pcol(c.winner)}">${c.winner==='D'?'Democrats':'Republicans'} win control</b>`;
+  else { const dNeed = Math.max(0,(c.toWin.DEM||0)-c.dem), rNeed = Math.max(0,(c.toWin.GOP||0)-c.gop); small.innerHTML = `D need <b>${dNeed}</b> · R need <b>${rNeed}</b>`; }
+  foot.innerHTML = `<span>${office==='S'? '51 to win · R wins ties' : '218 to win'}</span><b class="mj">${office==='S'? '51 · 50' : '218'}</b><span><b>${total-c.dem-c.gop-c.oth}</b> seats open${lead.D||lead.R? ` · leading <b style="color:var(--dem-ink)">D ${lead.D}</b> <b style="color:var(--gop-ink)">R ${lead.R}</b>`:''}</span>`;
+}
+
+function headline(){
+  const H = control('H'), S = control('S');
+  const hl = $('#headline'), sub = $('#sub');
+  if(!H || !S){ hl.innerHTML = 'Waiting for the first results.'; sub.textContent='Data from The Associated Press via The New York Times. Updates every 30 seconds.'; return; }
+  const flipsD = races.filter(r=>r.called && r.winner?.party==='D' && r.gained).length;
+  const flipsR = races.filter(r=>r.called && r.winner?.party==='R' && r.gained).length;
+  let h, s;
+  const dNeedS = Math.max(0,(S.toWin.DEM||51)-S.dem), rNeedS = Math.max(0,(S.toWin.GOP||50)-S.gop);
+  const sWin = S.winner || (dNeedS===0?'D': rNeedS===0?'R': null); const dNeedH = Math.max(0,(H.toWin.DEM||218)-H.dem), rNeedH = Math.max(0,(H.toWin.GOP||218)-H.gop); const hWin = H.winner || (dNeedH===0?'D': rNeedH===0?'R': null);
+  if(hWin && sWin){
+    h = hWin===sWin ? `${hWin==='D'?'Democrats':'Republicans'} win <mark>both chambers</mark>` : `A <mark>split Congress</mark>: ${sWin==='D'?'Dems':'Reps'} take the Senate, ${hWin==='D'?'Dems':'Reps'} the House`;
+  } else if(sWin){
+    h = `${sWin==='D'?'Democrats':'Republicans'} <mark>win the Senate</mark>`;
+  } else {
+    h = dNeedS<=rNeedS ? `Democrats need <mark>${dNeedS} more</mark> for the Senate` : `Republicans need <mark>${rNeedS} more</mark> to keep the Senate`;
+  }
+  if(hWin) s = `<b>${hWin==='D'?'Democrats':'Republicans'} win the House.</b> `;
+  else { s = `House: D need <b>${dNeedH}</b> more, R need <b>${rNeedH}</b> · `; }
+  const called = races.filter(r=>r.called).length;
+  s += called ? `<b>${called}</b> races called` : 'No races called yet';
+  const flipsI = races.filter(r=>r.called && r.winner?.party==='O' && r.gained).length;
+  if(flipsD||flipsR||flipsI) s += ` · flips <b style="color:var(--dem-ink)">D +${flipsD}</b>, <b style="color:var(--gop-ink)">R +${flipsR}</b>${flipsI?`, <b>I +${flipsI}</b>`:''}`;
+  hl.innerHTML = h.replace(/ (\S+)$/, '\u00a0$1'); sub.innerHTML = s;
+}
+
+function stateFill(st, office){
+  const rs = races.filter(r=>r.office===office && r.st===st);
+  if(!rs.length) return {fill:'var(--map-none)', on:false};
+  if(office==='H'){
+    const won = {D:0,R:0,O:0}, lead = {D:0,R:0,O:0};
+    for (const r of rs){ if(r.called) won[r.winner?.party||'O']++; else if(r.total>0 && r.cands[0]) lead[r.cands[0].party]++; }
+    const wTot = won.D+won.R+won.O, lTot = lead.D+lead.R+lead.O;
+    if(wTot){ if(won.D===won.R && lTot===0) return {fill:'var(--oth)', on:true}; const p = won.D>won.R?'D':won.R>won.D?'R':(lead.D>=lead.R?'D':'R'); return {fill: p==='D'?'var(--dem)':'var(--gop)', on:true}; }
+    if(lTot){ const p = lead.D>=lead.R?'D':'R'; return {fill: p==='D'?'url(#hD)':'url(#hR)', on:false}; }
+    const closed = pollsLast[st] && pollsLast[st] <= new Date();
+    return {fill: closed? 'var(--map-closed)':'var(--map-open)', on:false};
+  }
+  const r = rs.find(x=>x.called) || rs.find(x=>!x.special) || rs[0];
+  if(r.called){ const p=r.winner?.party; return {fill: p==='D'?'var(--dem)':p==='R'?'var(--gop)':'var(--oth)', on:true}; }
+  if(r.total>0 && r.cands[0]){ const p=r.cands[0].party; return {fill: p==='D'?'url(#hD)':p==='R'?'url(#hR)':'url(#hO)', on:false}; }
+  const closed = pollsLast[st] && pollsLast[st] <= new Date();
+  return {fill: closed? 'var(--map-closed)':'var(--map-open)', on:false};
+}
+
+function buildMap(){
+  const svg = $('#map');
+  let s = `<defs>
+    <pattern id="hD" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)"><rect width="10" height="10" fill="var(--dem-soft)"/><rect width="4" height="10" fill="var(--dem)"/></pattern>
+    <pattern id="hR" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)"><rect width="10" height="10" fill="var(--gop-soft)"/><rect width="4" height="10" fill="var(--gop)"/></pattern>
+    <pattern id="hO" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)"><rect width="10" height="10" fill="var(--oth-soft)"/><rect width="4" height="10" fill="var(--oth)"/></pattern>
+  </defs>`;
+  for (const [st,o] of Object.entries(STATES)){ if(!o.d) continue; s += `<path id="st-${st}" data-st="${st}" d="${o.d}" fill="var(--map-none)"/>`; }
+  const LABEL_FIX = {FL:[803,552], MI:[690,180], LA:[566,470], ID:[196,155]};
+  for (const [st,o] of Object.entries(STATES)){ if(!o.d || NE.includes(st)) continue; const c = LABEL_FIX[st]||o.c; s += `<text id="lb-${st}" x="${c[0]}" y="${c[1]+6}" text-anchor="middle">${st}</text>`; }
+  s += '<g class="ne">';
+  NE.forEach((st,i)=>{ const x=918, y=128+i*38; s += `<rect id="ne-${st}" data-st="${st}" x="${x}" y="${y}" width="54" height="32" fill="var(--map-none)"/><text id="lb-${st}" x="${x+27}" y="${y+23}" text-anchor="middle">${st}</text>`; });
+  s += '</g>';
+  svg.innerHTML = s;
+}
+
+function renderMap(){
+  const office = mapOffice;
+  $('#maptitle').textContent = office==='S'?'Senate map':office==='G'?'Governors map':'House map';
+  document.querySelectorAll('#mapseg button[data-o]').forEach(b=>{ const on=b.dataset.o===office; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  const n = races.filter(r=>r.office===office).length; const c = races.filter(r=>r.office===office && r.called).length;
+  $('#mapsub').textContent = `${c} of ${n} called`;
+  for (const st of Object.keys(STATES)){
+    const f = stateFill(st, office);
+    const p = document.getElementById('st-'+st); if(p) p.setAttribute('fill', f.fill);
+    const b = document.getElementById('ne-'+st); if(b) b.setAttribute('fill', f.fill);
+    const l = document.getElementById('lb-'+st); if(l) l.classList.toggle('on', f.on);
+  }
+  const rs = races.filter(r=>r.office===office);
+  const d = rs.filter(r=>r.called&&r.winner?.party==='D').length, g = rs.filter(r=>r.called&&r.winner?.party==='R').length;
+  const leadD = rs.filter(r=>!r.called&&r.total>0&&r.cands[0]?.party==='D').length, leadR = rs.filter(r=>!r.called&&r.total>0&&r.cands[0]?.party==='R').length;
+  const flips = rs.filter(r=>r.called&&r.gained);
+  const exp = rs.reduce((a,r)=>a+r.total,0), expT = rs.reduce((a,r)=>a+r.expected,0);
+  $('#mapfoot').innerHTML = `<span><b class="dem">${d}</b>Dem wins</span><span><b class="gop">${g}</b>Rep wins</span><span><b>${flips.length}</b>flip${flips.length===1?'':'s'}</span><span><b class="dem">${leadD}</b>Dem leading</span><span><b class="gop">${leadR}</b>Rep leading</span><span><b>${expT? Math.round(exp/expT*100):0}%</b>of expected vote in</span>`;
+}
+
+/* ---- state sheet ---- */
+function candRow(c, r){ return `<div class="cand ${c.party}"><span class="nm${r&&r.called&&r.winner?.id===c.id?' win':''}">${esc(c.name)}${c.inc?' <small>inc.</small>':''}</span><span class="pct">${r&&r.total? c.pct.toFixed(1):'—'}</span><span class="trk"><i style="width:${Math.min(100,c.pct)}%"></i></span></div>`; }
+function raceCard(r, opt={}){
+  const [a,b] = r.total>0 ? [r.cands[0], r.cands[1]||{name:'',party:'O',pct:0}] : (()=>{ const d=r.cands.find(c=>c.party==='D'&&!c.writein)||r.cands[0]; const g=r.cands.find(c=>c.party==='R'&&!c.writein)||r.cands.find(c=>c!==d)||{name:'',party:'O',pct:0}; return [d,g]; })();
+  const inTxt = r.called ? `${r.winner?.party==='D'?'Dem':r.winner?.party==='R'?'Rep':'Ind'} win${r.gained?' · FLIP':''}` : r.total>0 ? `${Math.round(r.eevp)}% in` : (pollsLast[r.st]? `closes ${fmtPT(pollsLast[r.st])}` : '');
+  const rating = r.rating? r.rating.replace('-',' ').replace('rep','R').replace('dem','D') : '';
+  const where = opt.sheet && r.office!=='H' ? `${r.officeName}${r.special?' special':''}` : esc(r.label);
+  const em = opt.sheet && r.office!=='H' ? (rating||'') : `${r.officeName}${r.special?' special':''}${rating?' · '+rating:''}`;
+  return `<div class="race${r.called&&r.gained&&r.winner?.party==='D'?' flipD':''}"><div class="hd"><span class="where">${where}${rbadge(r)}${em?`<em>${em}</em>`:''}</span><span class="in${r.called?' called '+(r.winner?.party||''):''}">${inTxt}</span></div><div class="cands">${a?candRow(a,r):''}${b?candRow(b,r):''}</div></div>`;
+}
+function openSheet(st){
+  const rs = races.filter(r=>r.st===st).sort((a,b)=>({S:0,G:1,H:2}[a.office]-{S:0,G:1,H:2}[b.office]) || ((+a.district||0)-(+b.district||0)));
+  const closed = pollsLast[st] ? (pollsLast[st] <= new Date() ? 'polls closed' : `polls close ${fmtPT(pollsLast[st])} PT`) : '';
+  $('#sheettitle').innerHTML = `${esc(NAMES[st]||st)}<small>${rs.length} race${rs.length===1?'':'s'} on the ballot${closed? ' · '+closed:''}</small>`;
+  const top = rs.filter(r=>r.office!=='H'), house = rs.filter(r=>r.office==='H');
+  const hs = house.filter(r=>r.called || r.total>0 || r.rating==='tossup' || /lean/.test(r.rating||''));
+  const hidden = house.length - hs.length;
+  $('#sheetbody').innerHTML = (rs.length? top.map(r=>raceCard(r,{sheet:true})).join('') + hs.map(r=>raceCard(r,{sheet:true})).join('') + (hidden? `<div class="empty">${hidden} more House seat${hidden>1?'s':''} rated safe and not yet reporting.</div>`:'') : '<div class="empty">No federal or governor race here this year.</div>');
+  document.body.classList.add('sheet-open'); $('#sheet').scrollTop = 0; $('#sheetclose').focus();
+}
+function closeSheet(){ document.body.classList.remove('sheet-open'); }
+$('#map').addEventListener('click', e=>{ const t=e.target.closest('[data-st]'); if(t) openSheet(t.dataset.st); });
+$('#sheetbg').addEventListener('click', closeSheet); $('#sheetclose').addEventListener('click', closeSheet);
+addEventListener('keydown', e=>{ if(e.key==='Escape') closeSheet(); });
+
+/* ---- races to watch ---- */
+function pickWatch(){
+  const live = races.filter(r=>!r.called && r.total>0 && r.cands.length>1);
+  const score = r=>{ const m = Math.abs((r.cands[0]?.pct||0)-(r.cands[1]?.pct||0)); const rt = r.rating==='tossup'?0:/lean/.test(r.rating||'')?1:/likely/.test(r.rating||'')?2:3; const off = r.office==='S'?0:r.office==='G'?0.5:1; return m*1.0 + rt*2 + off*2 - Math.min(r.eevp,95)/40; };
+  const N=6; let list = live.sort((a,b)=>score(a)-score(b)).slice(0,N);
+  if(list.length<N){
+    const upcoming = races.filter(r=>!r.called && r.total===0 && (r.rating==='tossup' || /lean/.test(r.rating||'')) && !list.includes(r))
+      .sort((a,b)=>{ const pa=polls[a.st]?.getTime()||9e15, pb=polls[b.st]?.getTime()||9e15; const ok={S:0,G:1,H:2}; const rk=r=>r.rating==='tossup'?0:1; return (ok[a.office]-ok[b.office]) || (pa-pb) || (rk(a)-rk(b)); });
+    list = list.concat(upcoming.slice(0,N-list.length));
+  }
+  if(list.length<N){ const recent = races.filter(r=>r.called && r.gained && !list.includes(r)).sort((a,b)=>new Date(b.calledAt||0)-new Date(a.calledAt||0)); list = list.concat(recent.slice(0,N-list.length)); }
+  return list;
+}
+function renderWatch(){
+  const list = pickWatch(); const el = $('#races');
+  const anyVotes = races.some(r=>r.total>0);
+  $('#watchnote').textContent = anyVotes? 'closest contests, live' : 'toss-ups by poll closing time';
+  if(!list.length){ el.innerHTML = '<div class="empty">The closest contests appear here as votes come in.</div>'; return; }
+  el.innerHTML = list.map(raceCard).join('');
+}
+
+/* ---- Polymarket odds ---- */
+const PM = { control:{}, races:{}, at:0, tok:{}, hist:{}, fetches:0 };
+const PM_PIN = ['TX','MI']; // always on top: Talarico (TX), El-Sayed (MI)
+const PM_KEY = ['TX','MI','GA','NC','ME','IA','OH','AK','NH','NE','KS','MN','FL'];
+function pmSlug(r){ const n=(NAMES[r.st]||'').toLowerCase().replace(/[^a-z]+/g,'-'); return r.office==='S'? `${n}-senate-election-winner` : r.office==='G'? `${n}-governor-winner-2026` : null; }
+async function fetchPM(){
+  try{
+    const want = races.filter(r=>r.office==='S'||r.office==='G'); const bySlug = {};
+    for (const r of want){ const sl = pmSlug(r); if(sl) (bySlug[sl]=bySlug[sl]||[]).push(r); }
+    const slugs = Object.keys(bySlug).concat(['which-party-will-win-the-senate-in-2026','which-party-will-win-the-house-in-2026','balance-of-power-2026-midterms']);
+    const evs = [];
+    for (let i=0;i<slugs.length;i+=20){ const r = await fetch('https://gamma-api.polymarket.com/events?'+slugs.slice(i,i+20).map(x=>'slug='+x).join('&'), {signal: withTimeout(20000)}); if(r.ok) evs.push(...await r.json()); }
+    for (const e of evs){
+      const ms = (e.markets||[]).filter(m=>m.outcomePrices && !/^(Person|Party) [A-Z]$/.test(m.groupItemTitle||'')).map(m=>({t:m.groupItemTitle||m.question, p:+JSON.parse(m.outcomePrices)[0]}));
+      if(e.slug==='balance-of-power-2026-midterms'){ const d = ms.find(m=>/Democrats Sweep/i.test(m.t)); PM.control.sweep = d? d.p : null; const dm=(e.markets||[]).find(m=>/Democrats Sweep/i.test(m.groupItemTitle||'')); try{ PM.tok.sweep = JSON.parse(dm.clobTokenIds)[0]; }catch(_){} continue; }
+      if(/which-party-will-win-the-(senate|house)/.test(e.slug)){ const key = e.slug.includes('senate')?'S':'H'; const dm = (e.markets||[]).find(m=>/Democratic/.test(m.groupItemTitle||'')); const d = ms.find(m=>/Democratic/.test(m.t)); PM.control[key] = d? d.p : null; try{ PM.tok[key] = JSON.parse(dm.clobTokenIds)[0]; }catch(_){} continue; }
+      for (const r of bySlug[e.slug]||[]){
+        const pick = p => { const cand = r.cands.find(c=>c.party===p && !c.writein); let m = cand && ms.find(x=>new RegExp('\\b'+cand.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b.*\\('+p+'\\)').test(x.t)); if(!m) m = ms.find(x=>new RegExp('\\('+p+'\\)').test(x.t) && !/^Other/i.test(x.t)); if(!m && cand) m = ms.find(x=>x.t.toLowerCase().includes(cand.name.toLowerCase()) && !/^Other/i.test(x.t)); return m; };
+        let d = pick('D'), g = pick('R'); if(!d){ const ind = r.cands.find(c=>c.party==='O'&&!c.writein); if(ind){ d = ms.find(x=>new RegExp('\\b'+ind.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(x.t)) || ms.find(x=>/^Independent$|\(I\)/i.test(x.t)); if(d) d = {...d, t: ind.first+' '+ind.name+' (I)'}; } } const prev = PM.races[r.id];
+        PM.races[r.id] = { d: d? d.p : null, r: g? g.p : null, dName: d?.t.replace(/\s*\([DR]\)\s*$/,'')||'', rName: g?.t.replace(/\s*\([DR]\)\s*$/,'')||'', prevD: prev? (prev.d) : null, slug:e.slug };
+      }
+    }
+    PM.at = Date.now(); PM.fetches++;
+    for (const key of ['S','H','sweep']){ if(!PM.tok[key]) continue; try{ const h = await fetch(`https://clob.polymarket.com/prices-history?market=${PM.tok[key]}&interval=1d&fidelity=10`, {signal: withTimeout(20000)}).then(r=>r.json()); if(h.history?.length) PM.hist[key] = h.history.map(x=>({t:x.t*1000,p:x.p})); }catch(e){} }
+  }catch(e){ console.warn('polymarket', e); }
+}
+function spark(key){
+  const h = PM.hist[key]; if(!h || h.length<2) return '';
+  const w=120, ht=34, t0=h[0].t, t1=h[h.length-1].t; const ps=h.map(x=>x.p); let lo=Math.min(...ps), hi=Math.max(...ps); if(hi-lo<0.06){ const m=(hi+lo)/2; lo=m-0.03; hi=m+0.03; }
+  const X=x=>((x.t-t0)/Math.max(1,t1-t0)*w).toFixed(1), Y=x=>(ht-(x.p-lo)/(hi-lo)*ht).toFixed(1);
+  const d = h.map((x,i)=>(i?'L':'M')+X(x)+','+Y(x)).join('');
+  const delta = Math.round((h[h.length-1].p - h[0].p)*100);
+  const mid = (lo<=0.5 && hi>=0.5) ? `<line x1="0" x2="${w}" y1="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" y2="${(ht-(0.5-lo)/(hi-lo)*ht).toFixed(1)}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/>` : '';
+  return `<span class="sp"><svg width="${w}" height="${ht}" viewBox="-2 -4 ${w+6} ${ht+8}" overflow="visible" aria-hidden="true">${mid}<path d="${d}" fill="none" stroke="var(--spark)" stroke-width="3" stroke-linejoin="round"/><circle cx="${X(h[h.length-1])}" cy="${Y(h[h.length-1])}" r="4" fill="var(--spark)"/></svg><span>24h ${delta>=0?'+':''}${delta} pts · ${Math.round(lo*100)}–${Math.round(hi*100)}%</span></span>`;
+}
+function runoffState(r){ const when = r.runoffDate? ' · '+r.runoffDate : ''; if(r.runoff) return 'RUNOFF'+when; if(r.called||!r.threshold||r.total===0) return null; const top=r.cands[0]?.pct||0; if(r.eevp>=40 && top<r.threshold) return 'runoff likely'+when; return null; }
+function rbadge(r){ const x=runoffState(r); return x? ` <span class="rbadge">${x}</span>` : ''; }
+function pct(p){ return p==null? '—' : (p>=0.995? '>99' : p<=0.005? '<1' : Math.round(p*100)) + '%'; }
+function renderOdds(){
+  const el = $('#oddsbody'); $('#oddsnote').textContent = PM.at? `Polymarket · updated ${fmtPT(new Date(PM.at))} PT` : 'Polymarket';
+  if(!PM.at){ el.innerHTML = '<div class="empty">Polymarket odds load in a moment.</div>'; return; }
+  const tile = (lbl,key)=>`<div class="tile"><small>${lbl}</small><b>${pct(PM.control[key])}</b>${spark(key)}</div>`;
+  const ctl = `<div class="ctl">${tile('Senate · Dem chance','S')}${tile('House · Dem chance','H')}${tile('Dem sweep (both chambers)','sweep')}</div>`;
+  const have = races.filter(r=>PM.races[r.id]?.d!=null);
+  if(!have.length){ el.innerHTML = ctl + '<div class="empty">Race markets load in a moment.</div>'; return; }
+  const score = r=>{ const o=PM.races[r.id]; const u = 1-Math.abs(o.d-0.5)*2; const pin = r.office==='S'? PM_PIN.indexOf(r.st) : -1; if(pin>=0) return -100+pin; return (r.called?2:0) + (r.office==='G'?0.25:0) - u - (PM_KEY.includes(r.st)&&r.office==='S'?0.6:0) - (r.total>0?0.3:0); };
+  const list = have.sort((a,b)=>score(a)-score(b)).slice(0, 8);
+  el.innerHTML = ctl + list.map(r=>{ const o=PM.races[r.id]; const dc = r.cands.find(c=>c.party==='D'&&!c.writein) || r.cands.find(c=>c.party==='O'&&!c.writein), rc = r.cands.find(c=>c.party==='R'&&!c.writein);
+    const delta = o.prevD!=null? Math.round((o.d-o.prevD)*100) : 0; const arrow = delta? `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'}${Math.abs(delta)}</span>` : '';
+    const status = r.called? `<b style="color:${pcol(r.winner?.party)}">${r.winner?.party==='D'?'Dem':'Rep'} win</b>` : r.total>0? `${Math.round(r.eevp)}% in` : (pollsLast[r.st]? `closes ${fmtPT(pollsLast[r.st])}`:'');
+    return `<div class="row"><div class="top"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${status}</span></div>
+      <div class="odds"><span class="nm ${dc?.party==='O'?'':'D'}">${esc(o.dName||dc?.name||'Dem')}</span><span class="v">${r.total&&dc? dc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.d)} ${arrow}<small>odds</small></span>
+      <span class="nm R">${esc(o.rName||rc?.name||'Rep')}</span><span class="v">${r.total&&rc? rc.pct.toFixed(1):'—'}<small>vote</small></span><span class="v">${pct(o.r)}<small>odds</small></span>
+      <span class="obar"><i style="width:${(o.d*100).toFixed(1)}%"></i><b style="left:50%"></b></span></div></div>`; }).join('');
+}
+
+/* ---- poll closings ---- */
+function renderClosing(){
+  const el = $('#closingbody'); const now = new Date(); const groups = {};
+  for (const [st,d] of Object.entries(polls)){ (groups[d.getTime()]=groups[d.getTime()]||[]).push(st); }
+  const keys = Object.keys(groups).map(Number).sort((a,b)=>a-b); if(!keys.length){ el.innerHTML = '<div class="empty">Poll-closing times load with the first results feed.</div>'; return; }
+  const nextK = keys.find(k=>k>now);
+  const isKey = r=>r.office!=='H' && (r.rating==='tossup'||/lean/.test(r.rating||''));
+  el.innerHTML = '<div class="tl">' + keys.map(k=>{ const sts = groups[k].sort(); const past = k<=now;
+    const key = sts.flatMap(st=>races.filter(r=>r.st===st&&isKey(r)).map(r=>`<b>${NAMES[st]} ${r.officeName}</b>`));
+    const hr = races.filter(r=>r.office==='H'&&sts.includes(r.st)&&(r.rating==='tossup')).length;
+    return `<div class="wave${past?' past':''}${k===nextK?' now':''}"><div class="t"><span style="font-size:inherit;color:inherit;font-weight:inherit">${fmtPT(new Date(k))}${past?' · closed':k===nextK?' · next':''}</span><span>${sts.length} state${sts.length>1?'s':''}</span></div><div class="sts">${sts.map(x=>pollsFirst[x]? x+'*' : x).join('  ')}</div><div class="l">${key.length? 'Key: '+key.join(', ') : 'No marquee statewide races'}${hr? ` · <b>${hr}</b> toss-up House seat${hr>1?'s':''}`:''}</div></div>`; }).join('') + '</div>';
+}
+
+/* ---- vote remaining ---- */
+function renderRemaining(){
+  const el = $('#rembody');
+  const rs = races.filter(r=>!r.called && r.total>0 && r.expected>r.total && r.cands.length>1 && (r.office!=='H' || r.rating==='tossup'))
+    .map(r=>{ const [a,b]=r.cands; const rem = Math.max(0, r.expected - r.total); const margin = a.votes-b.votes; const rem2 = r.total>0? rem*(a.votes+b.votes)/r.total : rem; const share = rem2>0? (margin+rem2)/(2*rem2) : 1; return {r,a,b,rem,margin,share}; })
+    .filter(x=>x.rem>0 && x.share<1.5 && x.r.eevp>=10).sort((x,y)=>(x.r.office==='H')-(y.r.office==='H') || x.share-y.share).slice(0,6);
+  if(!rs.length){ el.innerHTML = '<div class="empty">Shows uncalled races once at least 10% of the expected vote is in: the leader\'s margin, votes still out, and the share the trailer needs.</div>'; return; }
+  el.innerHTML = rs.map(({r,a,b,rem,margin,share})=>{ const pctIn = r.expected? Math.round(r.total/r.expected*100) : Math.round(r.eevp); const sharePct = +(share*100).toFixed(1);
+    const need = (share>=1 && r.eevp>=70) ? `<b style="color:var(--gop-ink)">${esc(b.name)} can't catch up</b> on the expected vote` : share>=1 ? `<b>${esc(b.name)}</b> needs more than all of what's left (expected vote may be revised)` : `<b>${esc(b.name)}</b> needs <b style="color:${pcol(b.party)}">${sharePct}%</b> of what's left`;
+    return `<div class="row rem"><div class="top"><span class="where">${esc(r.label)}${rbadge(r)}<em>${r.officeName}</em></span><span class="right">${pctIn}% in · ~${rem>=1e6? (rem/1e6).toFixed(1)+'M' : Math.round(rem/1000)+'K'} left</span></div>
+      <div class="lead"><b style="color:${pcol(a.party)}">${esc(a.name)} +${(margin).toLocaleString()}</b> · ${a.pct.toFixed(1)}–${b.pct.toFixed(1)}</div>
+      <div class="need">${need}</div>
+      <span class="obar" style="display:block"><i style="width:${Math.min(100,sharePct)}%;background:${b.party==='D'?'var(--dem)':'var(--gop)'}"></i><b style="left:50%"></b></span></div>`; }).join('');
+}
+
+/* ---- California: Secretary of State live returns ---- */
+const CA = { gov:null, asm:[], sen:[], props:[], at:0, reporting:'' };
+const CA_API = 'https://api.sos.ca.gov/returns/';
+function caParse(j){ const m = /([\d.]+)%\s*\((\S+) of (\S+)\)/.exec(j.Reporting||''); const cands=(j.candidates||[]).map(c=>({name:c.Name, party:c.Party==='Dem'?'D':c.Party==='Rep'?'R':'O', votes:+String(c.Votes).replace(/,/g,'')||0, pct:+c.Percent||0, inc:!!c.incumbent})).sort((a,b)=>b.votes-a.votes); return {title:j.raceTitle, rep: m? +m[1] : 0, cands, time:j.ReportingTime}; }
+async function fetchCA(){
+  const get = async u=>{ try{ const r=await fetch(CA_API+u,{cache:'no-cache', signal: withTimeout(20000)}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } };
+  const asmN = [...Array(80)].map((_,i)=>i+1), senN = [...Array(20)].map((_,i)=>(i+1)*2);
+  const [gov, props, ...rest] = await Promise.all([get('governor'), get('ballot-measures'), ...asmN.map(n=>get('state-assembly/district/'+n)), ...senN.map(n=>get('state-senate/district/'+n))]);
+  const fresh = j=>{ const t=Date.parse((j&&j.ReportingTime||'').replace(/\./g,'').replace(/(\d) ([ap])m/i,'$1 $2M')); return !t || t >= Date.parse('2026-11-03T08:00:00-08:00'); };
+  if(gov && fresh(gov)){ CA.gov = caParse(gov); CA.reporting = gov.Reporting||''; } else if(gov){ CA.gov=null; CA.reporting='no returns yet'; }
+  if(props) CA.props = (props['ballot-measures']||[]).map(x=>({n:+x.Number, name:x.Name, yes:+x.yesPercent||0, no:+x.noPercent||0, votes:(+String(x.yesVotes).replace(/,/g,'')||0)+(+String(x.noVotes).replace(/,/g,'')||0)}));
+  CA.asm = rest.slice(0,80).map((j,i)=>j? {...caParse(j), n:asmN[i]} : null).filter(Boolean);
+  CA.sen = rest.slice(80).map((j,i)=>j? {...caParse(j), n:senN[i]} : null).filter(Boolean);
+  CA.at = Date.now();
+}
+function caBar(label, list, total, superN){
+  const d = list.filter(r=>r.cands[0]?.votes>0 && r.cands[0].party==='D').length, g = list.filter(r=>r.cands[0]?.votes>0 && r.cands[0].party==='R').length;
+  return `<div class="cabop"><div class="name"><span>${label}</span><small>${total} seats up · ${superN} for a ⅔ majority</small></div><div class="bar"><div class="d" style="width:${d/total*100}%"></div><div class="r" style="width:${g/total*100}%"></div><div class="maj" style="left:${superN/total*100}%"><span>⅔</span></div><div class="num d">${d}<small>D lead</small></div><div class="num r"><small>R lead</small>${g}</div></div></div>`;
+}
+function renderCA(){
+  const el = $('#cabody'), note = $('#canote');
+  if(!CA.at){ note.textContent = 'Secretary of State returns'; el.innerHTML = '<div class="empty">California returns start after polls close at 8:00 PM PT.</div>'; return; }
+  note.textContent = `CA Secretary of State · ${CA.reporting.replace(/ precincts reporting/,'').replace(/\(.*\)/,'').trim()} of precincts`;
+  const g = CA.gov; const govRow = g? `<div class="race"><div class="hd"><span class="where">Governor<em>statewide</em></span><span class="in">${g.rep}% of precincts</span></div><div class="cands">${g.cands.slice(0,2).map(c=>candRow(c,{total:1})).join('')}</div></div>` : '';
+  const live = [...CA.asm.map(r=>({...r,kind:'AD'})), ...CA.sen.map(r=>({...r,kind:'SD'}))].filter(r=>r.cands.length>1 && r.cands[0].votes>0 && r.cands[0].party!==r.cands[1].party).sort((a,b)=>(a.cands[0].pct-a.cands[1].pct)-(b.cands[0].pct-b.cands[1].pct)).slice(0,4);
+  const rows = live.map(r=>`<div class="race"><div class="hd"><span class="where">${r.kind}-${r.n}<em>${r.kind==='AD'?'Assembly':'State Senate'}</em></span><span class="in">${r.rep}% in</span></div><div class="cands">${r.cands.slice(0,2).map(c=>candRow(c,{total:1})).join('')}</div></div>`).join('');
+  el.innerHTML = govRow + caBar('Assembly', CA.asm, 80, 54) + caBar('State Senate', CA.sen, 20, 14) + (rows ? `<div style="margin-top:14px">${rows}</div>` : '<div class="empty">Closest contested legislative districts appear here once precincts report.</div>');
+}
+function renderProps(){
+  const el = $('#propsbody');
+  if(!CA.props.length){ el.innerHTML = '<div class="empty">Statewide ballot measures appear once California starts reporting.</div>'; return; }
+  const ps = [...CA.props].sort((a,b)=>Math.abs(a.yes-50)-Math.abs(b.yes-50));
+  el.innerHTML = `<div class="props">` + ps.map(p=>`<div class="prop"><div class="t"><span>Prop ${p.n}</span><span style="color:${p.votes? (p.yes>=50?'var(--dem-ink)':'var(--gop-ink)'):'var(--muted)'}">${p.votes? (p.yes>=50?'Yes ':'No ')+(p.yes>=50?p.yes:p.no).toFixed(1)+'%' : '—'}</span></div><div class="n" title="${esc(p.name)}">${esc(p.name.replace(/\.?\s*(Legislative|Initiative)[^.]*\.?\s*$/,'').replace(/\.$/,''))}</div><div class="b"><i style="width:${p.yes}%"></i><b></b></div></div>`).join('') + '</div>';
+}
+
+/* ---- calls list (vertical, newest first) ---- */
+let callsSig = '', callsAll = false;
+function renderCalls(){
+  const calls = races.filter(r=>r.called).sort((a,b)=>(Date.parse(b.calledAt)||0)-(Date.parse(a.calledAt)||0));
+  const el = $('#calls'), more = $('#morecalls');
+  const sig = calls.map(r=>r.id+(r.winner?.party||'')).join('|') + (callsAll?'+':''); if(sig===callsSig && calls.length) return; callsSig = sig;
+  const flips = calls.filter(r=>r.gained).length;
+  $('#callsub').textContent = `${calls.length} so far${flips?` · ${flips} flip${flips>1?'s':''}`:''}`;
+  if(!calls.length){ const first = Object.values(polls).sort((a,b)=>a-b)[0]; el.innerHTML = `<div class="empty">No races called yet.${first? ' First polls close at '+fmtPT(first)+' PT.':''}</div>`; more.hidden = true; return; }
+  const LIMIT = 25; const shown = callsAll? calls : calls.slice(0, LIMIT);
+  const groups=[]; for(const r of shown){ const key = r.calledAt? fmtPT(new Date(r.calledAt)) : ''; const g=groups[groups.length-1]; if(g && g.key===key) g.items.push(r); else groups.push({key, items:[r]}); }
+  const chip = r=>{ const p=r.winner?.party||'O'; const name = r.office==='H'? esc(r.winner?.name||'') : esc(`${r.winner?.first||''} ${r.winner?.name||''}`.trim()); return `<div class="call ${p}"><span class="tag ${p}">${p==='D'?'D':p==='R'?'R':'I'}</span><span class="who"><b>${esc(r.office==='H'? r.label : r.label+' '+r.officeName)}</b><span>${name}</span></span>${r.gained?'<span class="flip">FLIP</span>':'<span></span>'}</div>`; };
+  el.innerHTML = groups.map(g=>`<div class="tgroup"><time>${g.key} PT</time>${g.items.map(chip).join('')}</div>`).join('');
+  more.hidden = calls.length<=LIMIT; more.textContent = callsAll? 'Show fewer' : `Show all ${calls.length} calls`;
+}
+$('#morecalls').addEventListener('click', ()=>{ callsAll = !callsAll; renderCalls(); });
+
+function renderAll(){
+  headline();
+  renderBop('bopS', control('S'), 'S');
+  renderBop('bopH', control('H'), 'H');
+  renderMap(); renderWatch(); renderOdds(); renderClosing(); renderRemaining(); renderCA(); renderProps(); renderCalls();
+}
+
+/* ===================== CHANGE DETECTION → light celebrations ===================== */
+let finaleSeen = (()=>{ try{ return JSON.parse(localStorage.getItem('en26finale')||'{}'); }catch(e){ return {}; } })();
+function detectFinales(){
+  for (const ch of ['H','S']){
+    const c = control(ch); if(!c) continue;
+    const won = c.winner==='D' || (c.toWin?.DEM && c.dem >= c.toWin.DEM);
+    if(!won || finaleSeen[ch]) continue;
+    finaleSeen[ch] = true; if(!DEMO) try{ localStorage.setItem('en26finale', JSON.stringify(finaleSeen)); }catch(e){}
+    if(!DEMO && !feedSeen[ch]) continue;
+    toast({finale:ch});
+  }
+}
+function detectCalls(){
+  const batch = [];
+  for (const r of races){
+    if(!r.called) continue;
+    const p = r.winner?.party;
+    if(seen[r.id]===p) continue;
+    seen[r.id] = p;
+    if(!DEMO && !feedSeen[r.office]) continue;   // first time this feed arrives: record, don't replay history
+    batch.push(r);
+  }
+  if(!DEMO) saveSeen();
+  for (const r of batch) toast(r);
+}
+
+/* ===================== TOAST + CONFETTI (DOM only, no canvas, no sound) ===================== */
+let toastTimer, toastQueue = [], toastBusy = false;
+function toast(r){ toastQueue.push(r); if(!toastBusy) showToast(); }
+function showToast(){
+  const t = $('#toast'); if(!toastQueue.length){ toastBusy=false; return; } toastBusy = true;
+  const batch = toastQueue.splice(0); let html, party;
+  const fin = batch.find(x=>x.finale);
+  if(fin){ const ch = fin.finale==='H'? 'House' : 'Senate'; const c = control(fin.finale); party='D'; html = `<span class="hl">Democrats take the ${ch}</span><small>${c? `${c.dem} seats · majority is ${c.toWin.DEM||(fin.finale==='H'?218:51)} · ` : ''}called by AP</small>`; }
+  else if(batch.length===1){ const r=batch[0]; party = r.winner?.party||'O'; const nm = `${r.winner?.first||''} ${r.winner?.name||''}`.trim();
+    html = `<span class="tag ${party}">${party==='D'?'DEM':party==='R'?'GOP':'IND'}</span>${esc(r.label)} ${r.officeName}${r.gained?' <span class="flip">FLIP</span>':''}<small>${esc(nm)} wins${r.eevp?` · ${Math.round(r.eevp)}% of the vote in`:''}</small>`; }
+  else { const d = batch.filter(x=>x.winner?.party==='D'), g = batch.filter(x=>x.winner?.party==='R'); party = d.length>=g.length? 'D':'R'; const flips=batch.filter(x=>x.gained).length;
+    html = `<span class="tag ${party}">${party==='D'?'DEM':'GOP'}</span>${batch.length} new calls${d.length?` · D ${d.length}`:''}${g.length?` · R ${g.length}`:''}${flips?` · ${flips} flip${flips>1?'s':''}`:''}<small>${batch.slice(0,4).map(x=>esc(x.office==='H'?x.label:`${x.label} ${x.officeName}`)).join(' · ')}${batch.length>4?` · +${batch.length-4} more`:''}</small>`; }
+  t.innerHTML = html; t.className = 'on '+party;
+  if(party==='D') confetti(fin? 140 : 80);
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ t.classList.remove('on'); setTimeout(showToast, 500); }, fin? 8000 : 5500);
+}
+function confetti(n){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const host = $('#confetti'); const colors = ['#2E6FE0','#FFE34D','#7FAAF6','#BBD0F5', getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#151412'];
+  const W = innerWidth, H = innerHeight; const frag = document.createDocumentFragment();
+  for (let i=0;i<n;i++){
+    const el = document.createElement('i'); el.style.background = colors[i%colors.length]; el.style.left = (W/2)+'px'; el.style.top = (H*0.62)+'px';
+    const ang = -Math.PI/2 + (Math.random()-.5)*1.6, v = 260+Math.random()*420; const dx = Math.cos(ang)*v, dy = Math.sin(ang)*v;
+    const rot = (Math.random()-.5)*900, dur = 1500+Math.random()*900;
+    el.animate([
+      {transform:`translate(0,0) rotate(0deg)`, opacity:1},
+      {transform:`translate(${dx*0.6}px,${dy*0.6}px) rotate(${rot*0.5}deg)`, opacity:1, offset:.4},
+      {transform:`translate(${dx}px,${dy+H*0.55}px) rotate(${rot}deg)`, opacity:0}
+    ], {duration:dur, easing:'cubic-bezier(.15,.7,.4,1)', fill:'forwards'});
+    frag.appendChild(el); setTimeout(()=>el.remove(), dur+50);
+  }
+  host.appendChild(frag);
+}
+
+/* ===================== MAIN LOOP ===================== */
+let inFlight = false, inFlightSince = 0;
+async function tick(){
+  if(inFlight && Date.now()-inFlightSince < 60000) return; inFlight = true; inFlightSince = Date.now();
+  try{ await tickInner(); } finally { inFlight = false; }
+}
+async function tickInner(){
+  const now = Date.now();
+  const due = DEMO ? Object.keys(FILES) : Object.keys(FILES).filter(k=>now>=nextDue[k]);
+  const fresh = due.length ? await fetchAll(due) : {};
+  const ok = Object.values(fresh).some(Boolean);
+  let changed = false;
+  if(ok){
+    for (const k in fresh){ const f = fresh[k]; if(!f) continue;
+      nextDue[k] = now + FEED_MS[k] - POLL_MS/2;
+      if(!f.changed) continue; changed = true;
+      if(f.json){ data[k] = f.json; normDirty[k] = true; }
+      else { data[k] = f.meta; racesBy[k] = f.races; normDirty[k] = false; for (const r of f.races) if(r.calledAt) callSeenAt[r.id] ||= r.calledAt; }
+    }
+    lastOk = Date.now();
+  }
+  else if(!lastOk){ const el=$('#status'); el.textContent = "Can't reach the results feed — retrying"; el.classList.add('err'); }
+  if(DEMO){ demoMutate(); changed = true; for (const k in data) if(data[k]) normDirty[k] = true; }
+  if(changed || !races.length) normalize();
+  renderAll(); detectCalls(); detectFinales(); for (const k in fresh) if(fresh[k]) feedSeen[k] = true;
+  renderClock();
+}
+buildMap(); renderMap();
+setInterval(renderClock, 1000);
+$('#mapseg').addEventListener('click', e=>{ const b=e.target.closest('button[data-o]'); if(!b) return; mapOffice = b.dataset.o; renderMap(); });
+/* California: nothing to fetch before CA polls close (8:00 PM PT); then every 5 min until 9:00 PM PT, then every 2 min. DEMO: plain 2-min loop. */
+let caLast = 0;
+setTimeout(async function caLoop(){
+  if(DEMO){ await fetchCA(); renderCA(); renderProps(); setTimeout(caLoop, 120000); return; }
+  const now = Date.now(); const open = (polls.CA || ptDate('20:00')).getTime(), late = ptDate('21:00').getTime();
+  const every = now < open ? Infinity : now < late ? 300000 : 120000;
+  if(now - caLast >= every){ caLast = now; await fetchCA(); renderCA(); renderProps(); }
+  setTimeout(caLoop, 30000);
+}, 6000);
+setTimeout(async function pmLoop(){ if(races.length){ await fetchPM(); renderOdds(); } setTimeout(pmLoop, 90000); }, 4000);
+startWorker(); tick(); setInterval(tick, POLL_MS);
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') tick(); });   // phone came back from the lock screen: refresh now
+/* theme: #dark / #light in the URL, then the saved choice, then the phone's setting */
+function setTheme(t){ document.documentElement.dataset.theme = t; try{ localStorage.setItem('en26theme', t); }catch(e){} const b=$('#themebtn'); if(b){ b.setAttribute('aria-label', t==='dark'? 'Switch to light mode' : 'Switch to dark mode'); } }
+setTheme(location.hash.includes('dark')? 'dark' : location.hash.includes('light')? 'light' : ((()=>{ try{ return localStorage.getItem('en26theme'); }catch(e){ return null; } })() || (matchMedia('(prefers-color-scheme: dark)').matches? 'dark':'light')));
+$('#themebtn').onclick = ()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+addEventListener('keydown', e=>{ if(e.target.closest('input,textarea')) return; if(e.key==='d'||e.key==='D') $('#themebtn').click(); if(e.key==='m'||e.key==='M'){ mapOffice = mapOffice==='S'?'H':mapOffice==='H'?'G':'S'; renderMap(); } });
+
+/* ===================== DEMO (#demo in the URL): fake results so you can preview the night — same mutation as the TV page ===================== */
+let demoStep = 0;
+function demoMutate(){
+  demoStep++;
+  if(CA.at){ const fake=(r,i)=>{ const p=Math.min(99,demoStep*15+(i%7)*3); r.rep=p; const a=45+((i*37)%12); if(r.cands[0]){ r.cands[0].pct=a; r.cands[0].votes=Math.round(a*p*30);} if(r.cands[1]){ r.cands[1].pct=100-a-2; r.cands[1].votes=Math.round((98-a)*p*30);} r.cands.sort((x,y)=>y.votes-x.votes); };
+    CA.asm.forEach(fake); CA.sen.forEach(fake); if(CA.gov) fake(CA.gov,3); CA.props.forEach((p,i)=>{ p.yes=35+((i*23)%30); p.no=100-p.yes; p.votes=1e6; }); CA.reporting=`${Math.min(99,demoStep*15)}% (x of y) precincts reporting`; }
+  const rnd = (seed)=>{ let x=Math.sin(seed*9301+49297)*233280; return x-Math.floor(x); };
+  for (const office of ['S','G','H']){ const j=data[office]; if(!j) continue;
+    j.races.forEach((r,i)=>{ const ru=r.top_reporting_unit; if(!ru||!ru.candidates?.length) return; const seed=i+office.charCodeAt(0)*7;
+      const prog = Math.min(1, Math.max(0, (demoStep*0.12 + rnd(seed)*0.6 - 0.3)));
+      if(!ru.historical_comparison_race_data){ ru.historical_comparison_race_data={'X-2024':{margin:(rnd(seed+9)-.5)*30}}; ru.historical_comparison_race_meta={'X-2024':{label:'2024 presidential'}}; }
+      if(prog<=0) return; ru.eevp = Math.round(prog*99); const exp = ru.total_expected_vote||500000; ru.total_votes = Math.round(exp*prog);
+      const lean = rnd(seed+1); let rem=1; ru.candidates.forEach((c,ci)=>{ const meta=r.candidate_metadata[c.nyt_id]; const p=meta?.party?.nyt_id; const share = ci===ru.candidates.length-1? rem : Math.max(0.02, Math.min(rem, (p==='DEM'? 0.42+lean*0.16 : p==='GOP'? 0.42+(1-lean)*0.16 : 0.03) + (rnd(seed+ci+demoStep)-.5)*0.03)); rem-=share; c.votes={total:Math.round(ru.total_votes*share)}; });
+      ru.candidates.forEach(c=>c.leader=false); const top=[...ru.candidates].sort((a,b)=>b.votes.total-a.votes.total)[0]; if(top) top.leader=true;
+      if(prog>0.75 && !r.outcome.won.length){ r.outcome.won=[top.nyt_id]; r.outcome.winner_accepted_at=[new Date().toISOString()]; r.race_call_status='called'; const p=r.candidate_metadata[top.nyt_id]?.party?.nyt_id; if(rnd(seed+5)<0.25) r.outcome.gained = p; }
+    });
+    const pc=j.partyControlData?.results?.[0]?.offices?.[office==='G'?'S':office]; if(pc && office!=='G'){ let d=0,g=0; j.races.forEach(r=>{ if(!r.outcome.won.length) return; const p=r.candidate_metadata[r.outcome.won[0]]?.party?.nyt_id; if(p==='DEM') d++; else if(p==='GOP') g++; }); pc.party_balance.DEM.seats=(office==='S'?34:0)+d; pc.party_balance.GOP.seats=(office==='S'?31:0)+g; pc.num_races_called=d+g; pc.party_balance.DEM.winner = pc.party_balance.DEM.seats>=pc.to_win.DEM; pc.party_balance.GOP.winner = pc.party_balance.GOP.seats>=pc.to_win.GOP; }
+  }
+}
+</script>
+</body>
+</html>
