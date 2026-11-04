@@ -47,13 +47,16 @@ All three APIs are public and CORS-enabled, so the page fetches them directly fr
   browser autoplay rules. Both settings are remembered.
 
 ## The fun part
-Every Democratic call fires one of thirteen animations in rotation, with confetti, a screen shake and (if sound is on) its
+Every Democratic call fires one of 38 animations, picked at random with no repeat inside any three-animation window, with confetti, a screen shake and (if sound is on) its
 own sound effect — rolling ball and pin crash, rocket whistle and boom, bat crack, reel ticks and jackpot chime, kick and
 ref whistle, plus a crowd cheer: a bowling strike
 (googly-eyed ball), the state itself launching as a rocket and bursting into fireworks, a donkey piñata getting whacked,
 a slot machine landing D·D·D with a jackpot coin rain, a boot kicking a field goal, a stampede of blue donkeys,
-a blue wave crashing across the screen, a UFO beaming the state up into the mothership, a T. rex, a wrecking ball through a
-brick wall, a jetpack donkey with a rainbow contrail, a circus cannon, and a disco. When AP calls a chamber for the
+a blue wave, a UFO abduction, a T. rex, a wrecking ball, a jetpack donkey, a circus cannon, a disco, a wrestling elbow-drop,
+a volcano, whack-a-mole, the pins' revenge, a rubber-duck armada, an air horn, a pizza delivery, a toaster, a giant hand
+("YOINK!"), a laser cat, a hot-air balloon, bubble wrap, a prize wheel, a snow globe, a donkey DJ, a cow catapult, a submarine,
+a treadmill, a DVD-logo ball that hits the corner, a drive-thru order #218, an elevator to floor 218, a gnome parade, a roller
+coaster loop, a lasso, and a falling piano. When AP calls a chamber for the
 Democrats there's a much longer multi-act finale (one for the House, one for the Senate) that plays exactly once. A burst of calls at once
 becomes one combined celebration. Republican calls get a quiet corner toast.
 
@@ -73,6 +76,9 @@ It's a static page, so any static host works. On Vercel:
 - **From GitHub:** vercel.com/new → import this repo → framework "Other", leave build/output empty → Deploy. Every push
   redeploys.
 
+**Analytics:** Vercel Web Analytics is wired in via the plain-HTML snippet (`/_vercel/insights/script.js`), loaded only when
+the page is served over https; enable Web Analytics on the Vercel project and page views appear after the next deploy.
+
 **Custom domain (Cloudflare DNS):** in Vercel, Settings → Domains → add the subdomain. In Cloudflare, add a `CNAME`
 record for it pointing to `cname.vercel-dns.com` with proxy status **DNS only** (grey cloud) — with the orange proxy on,
 Vercel can't verify the domain or issue its certificate. The domain goes valid within a couple of minutes and Vercel
@@ -82,7 +88,7 @@ Once hosted, a TV just needs a browser pointed at the URL (TV Bro or Chrome on A
 the ADB scripts below are only for serving from a PC on the same network.
 
 ## Keys
-`T` random celebration · `1`–`9`, `0`, `Q`, `W`, `E` a specific one · `H` / `J` the House / Senate finale (test keys need Shift, `#demo` or `?debug`) · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
+`T` random celebration · `1`–`9`, `0`, `Q`, `W`, `E` a specific one · `H` / `J` the House / Senate finale (test keys need Shift, `#demo` or `?debug`); `?anim=name` (or a comma list) previews any animation by name · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
 Calls already on screen when the page first loads don't re-trigger (remembered in `localStorage`), so refreshing is safe.
 
 ## Notes
