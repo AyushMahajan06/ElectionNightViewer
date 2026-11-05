@@ -298,7 +298,7 @@
 <div id="welcome" hidden><div class="card">
   <div class="k">Election Night 2026</div>
   <h1>The night's over.<br>The board <mark>stays up</mark>.</h1>
-  <p>Everything below is the final count as AP reported it. The celebrations are still here too — the three big finales and all 63 animations live under <b>Replay</b> in the bottom-right corner.</p>
+  <p>Everything below is the final count as AP reported it. The celebrations are still here too: the three big finales and all 63 animations live under <b>Replay</b> in the bottom-right corner.</p>
   <div class="row"><button id="welcomego">Show me the board</button><button id="welcomereplay" class="alt">▶ Open Replay</button></div>
 </div></div>
 
@@ -1059,7 +1059,7 @@ if(ARCHIVE){
   $('#top .live').innerHTML = '<i></i>FINAL';
   $('#replaybtn').hidden = false; $('#replaybtn').onclick = ()=>{ if($('#replay').hidden) buildReplay(); openReplay(); }; $('#replayclose').onclick = ()=>openReplay(false);
   $('#welcome').hidden = false; $('#welcomego').onclick = ()=>{ $('#welcome').hidden = true; };   // shown on every load, by request
-  $('#welcomereplay').onclick = ()=>{ $('#welcome').hidden = true; buildReplay(); openReplay(true); };
+  $('#welcomereplay').onclick = ()=>{ $('#welcome').hidden = true; setSound(true); buildReplay(); openReplay(true); };
 }
 $('#soundbtn').onclick = ()=>setSound(!soundOn);
 if(soundOn){ const b=$('#soundbtn'); b.classList.add('on'); b.textContent='Sound: on';
