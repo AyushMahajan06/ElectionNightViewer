@@ -218,6 +218,8 @@
   #welcome mark{background:var(--hl);color:#151412;padding:0 .15em}
   #welcome p{font-size:calc(20px*var(--s,1));line-height:1.4;font-weight:500;margin:0 0 calc(22px*var(--s,1))}
   #welcome button{all:unset;cursor:pointer;font:900 calc(18px*var(--s,1))/1 "Archivo",system-ui,sans-serif;background:var(--ink);color:var(--paper);padding:calc(14px*var(--s,1)) calc(22px*var(--s,1))}
+  #welcome .row{display:flex;gap:calc(12px*var(--s,1));flex-wrap:wrap}
+  #welcome button.alt{background:var(--hl);color:#151412;box-shadow:inset 0 0 0 2px #151412}
   /* ---- celebration overlay ---- */
   #fx{position:fixed;inset:0;pointer-events:none;z-index:50;display:none}
   #fx.on{display:block}
@@ -296,8 +298,8 @@
 <div id="welcome" hidden><div class="card">
   <div class="k">Election Night 2026</div>
   <h1>The night's over.<br>The board <mark>stays up</mark>.</h1>
-  <p>Everything below is the final count as AP reported it. The celebrations are still here too — open <b>Replay</b> in the bottom-right corner to watch any of them, including the three big finales.</p>
-  <button id="welcomego">Show me the board</button>
+  <p>Everything below is the final count as AP reported it. The celebrations are still here too — the three big finales and all 63 animations live under <b>Replay</b> in the bottom-right corner.</p>
+  <div class="row"><button id="welcomego">Show me the board</button><button id="welcomereplay" class="alt">▶ Open Replay</button></div>
 </div></div>
 
 <script>
@@ -321,7 +323,7 @@ const DEMO = location.hash.includes('demo');
 /* ---- post-election (archive) mode: flip ARCHIVE_MODE to true once the night is over. `?archive` previews it. ----
    Final numbers keep coming from the same AP/NYT files (polled slowly); no celebrations fire on their own; a Replay menu
    (bottom right) replays the finales and any animation; a one-time welcome note explains. */
-const ARCHIVE_MODE = false;
+const ARCHIVE_MODE = true;
 const ARCHIVE = ARCHIVE_MODE || /[?&]archive/.test(location.search);
 // AP does not call a statewide race until the LAST polls in the state close. The feed gives the FIRST closing for split-zone states; AP's last-close times (Pacific) per AP Decision Notes:
 const LAST_CLOSE_PT = {KY:'16:00', IN:'16:00', FL:'17:00', NH:'17:00', TX:'18:00', MI:'18:00', KS:'18:00', ND:'18:00', ID:'20:00'};
@@ -1057,6 +1059,7 @@ if(ARCHIVE){
   $('#top .live').innerHTML = '<i></i>FINAL';
   $('#replaybtn').hidden = false; $('#replaybtn').onclick = ()=>{ if($('#replay').hidden) buildReplay(); openReplay(); }; $('#replayclose').onclick = ()=>openReplay(false);
   $('#welcome').hidden = false; $('#welcomego').onclick = ()=>{ $('#welcome').hidden = true; };   // shown on every load, by request
+  $('#welcomereplay').onclick = ()=>{ $('#welcome').hidden = true; buildReplay(); openReplay(true); };
 }
 $('#soundbtn').onclick = ()=>setSound(!soundOn);
 if(soundOn){ const b=$('#soundbtn'); b.classList.add('on'); b.textContent='Sound: on';

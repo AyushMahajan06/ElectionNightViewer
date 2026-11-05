@@ -340,7 +340,7 @@ const FEED_MS = {S:30000, G:30000, H:60000};
 const TZ = 'America/Los_Angeles';
 const DEMO = location.hash.includes('demo');
 /* post-election mode: keep in sync with ARCHIVE_MODE in index.html; `?archive` previews it */
-const ARCHIVE_MODE = false;
+const ARCHIVE_MODE = true;
 const ARCHIVE = ARCHIVE_MODE || /[?&]archive/.test(location.search);
 if(ARCHIVE){ FEED_MS.S = FEED_MS.G = FEED_MS.H = 600000; }
 // AP does not call a statewide race until the LAST polls in the state close. The feed gives the FIRST closing for split-zone states; AP's last-close times (Pacific) per AP Decision Notes:
