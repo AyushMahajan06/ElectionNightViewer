@@ -99,8 +99,14 @@ provisions HTTPS automatically.
 Once hosted, a TV just needs a browser pointed at the URL (TV Bro or Chrome on Android/Google TV; Silk on Fire TV);
 the ADB scripts below are only for serving from a PC on the same network.
 
+## After the election
+Flip `ARCHIVE_MODE` to `true` near the top of the script in `index.html` (and in `mobile.html`) and redeploy. The board
+keeps showing the final AP numbers (polled every 10 min instead of 30 s), nothing fires on its own, a note on every load
+explains the night is over, and a **Replay** button (bottom right, or `R`) replays the House and Senate finales, the Texas
+special and any of the 63 animations using real called races. `?archive` on the URL previews the mode before flipping it.
+
 ## Keys
-`T` random celebration · `1`–`9`, `0`, `Q`, `W`, `E` a specific one · `H` / `J` the House / Senate finale (test keys need Shift, `#demo` or `?debug`); `?anim=name` (or a comma list) previews any animation by name · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
+`T` random celebration · `1`–`9`, `0`, `Q`, `W`, `E` a specific one · `H` / `J` the House / Senate finale · `X` the Texas special (test keys need Shift, `#demo` or `?debug`); `?anim=name` (or a comma list) previews any animation by name · `←` `→` or `P` switch panel · `M` next map · `D` dark mode · `S` sound · `#demo` in the URL for fake results.
 Calls already on screen when the page first loads don't re-trigger (remembered in `localStorage`), so refreshing is safe.
 
 ## Notes

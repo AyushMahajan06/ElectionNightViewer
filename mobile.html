@@ -67,6 +67,14 @@
   #themebtn .sun{display:none} :root[data-theme="dark"] #themebtn .sun{display:block} :root[data-theme="dark"] #themebtn .moon{display:none}
 
   /* ---- next poll closing strip ---- */
+  #welcome[hidden]{display:none}
+  #welcome{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:var(--gutter);background:rgba(21,20,18,.55)}
+  #welcome .card{width:min(100%,520px);background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:24px 22px}
+  #welcome .k{font-weight:900;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--muted)}
+  #welcome h1{font-size:34px;line-height:1.02;letter-spacing:-.02em;margin:8px 0 12px}
+  #welcome mark{background:var(--hl);color:#151412;padding:0 .15em}
+  #welcome p{font-size:17px;line-height:1.4;font-weight:500;margin:0 0 18px}
+  #welcome button{all:unset;cursor:pointer;min-height:44px;box-sizing:border-box;font:900 16px/1 "Archivo",system-ui,sans-serif;background:var(--ink);color:var(--paper);padding:14px 20px}
   #next{padding:10px var(--gutter);font-size:14px;font-weight:500;color:var(--muted);border-bottom:1px solid var(--rule);line-height:1.3}
   #next:empty{display:none}
   #next b{color:var(--ink);font-weight:700}
@@ -310,6 +318,12 @@
 <div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"><div class="hd"><h3 id="sheettitle"></h3><button id="sheetclose" type="button" aria-label="Close">×</button></div><div id="sheetbody"></div></div>
 <div id="confetti" aria-hidden="true"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="welcome" hidden><div class="card">
+  <div class="k">Election Night 2026</div>
+  <h1>The night's over.<br>The board <mark>stays up</mark>.</h1>
+  <p>Everything below is the final count as AP reported it. The big-screen version at <b>/</b> still has every celebration under its Replay button.</p>
+  <button id="welcomego">Show me the board</button>
+</div></div>
 
 <script src="feed-worker.js"></script>
 <script>
@@ -325,6 +339,10 @@ const POLL_MS = 30000;
 const FEED_MS = {S:30000, G:30000, H:60000};
 const TZ = 'America/Los_Angeles';
 const DEMO = location.hash.includes('demo');
+/* post-election mode: keep in sync with ARCHIVE_MODE in index.html; `?archive` previews it */
+const ARCHIVE_MODE = false;
+const ARCHIVE = ARCHIVE_MODE || /[?&]archive/.test(location.search);
+if(ARCHIVE){ FEED_MS.S = FEED_MS.G = FEED_MS.H = 600000; }
 // AP does not call a statewide race until the LAST polls in the state close. The feed gives the FIRST closing for split-zone states; AP's last-close times (Pacific) per AP Decision Notes:
 const LAST_CLOSE_PT = {KY:'16:00', IN:'16:00', FL:'17:00', NH:'17:00', TX:'18:00', MI:'18:00', KS:'18:00', ND:'18:00', ID:'20:00'};
 const ptDate = hhmm => new Date(`2026-11-03T${hhmm}:00-08:00`);
@@ -414,6 +432,7 @@ const pcol = p=>p==='D'?'var(--dem-ink)':p==='R'?'var(--gop-ink)':'var(--ink)';
 function renderClock(){
   const now = new Date();
   $('#clock').innerHTML = fmtPT(now) + '<small>PT</small>';
+  if(ARCHIVE){ $('#next').innerHTML = 'Election night is over · <b>final results</b> as reported by AP'; $('#status').textContent = lastOk? 'Final results' : 'Loading final results…'; $('#status').classList.remove('err'); return; }
   const groups = {};
   for (const [st,d] of Object.entries(polls)){ if(d>now){ const k=d.getTime(); (groups[k]=groups[k]||[]).push(st); } }
   const keys = Object.keys(groups).map(Number).sort((a,b)=>a-b);
@@ -722,6 +741,7 @@ function renderAll(){
 /* ===================== CHANGE DETECTION → light celebrations ===================== */
 let finaleSeen = (()=>{ try{ return JSON.parse(localStorage.getItem('en26finale')||'{}'); }catch(e){ return {}; } })();
 function detectFinales(){
+  if(ARCHIVE){ for (const ch of ['H','S']){ const c=control(ch); if(c && (c.winner==='D' || (c.toWin?.DEM && c.dem>=c.toWin.DEM))) finaleSeen[ch]=true; } return; }
   for (const ch of ['H','S']){
     const c = control(ch); if(!c) continue;
     const won = c.winner==='D' || (c.toWin?.DEM && c.dem >= c.toWin.DEM);
@@ -732,6 +752,7 @@ function detectFinales(){
   }
 }
 function detectCalls(){
+  if(ARCHIVE){ for (const r of races) if(r.called) seen[r.id]=r.winner?.party; saveSeen(); return; }
   const batch = [];
   for (const r of races){
     if(!r.called) continue;
@@ -846,6 +867,10 @@ function demoMutate(){
     const pc=j.partyControlData?.results?.[0]?.offices?.[office==='G'?'S':office]; if(pc && office!=='G'){ let d=0,g=0; j.races.forEach(r=>{ if(!r.outcome.won.length) return; const p=r.candidate_metadata[r.outcome.won[0]]?.party?.nyt_id; if(p==='DEM') d++; else if(p==='GOP') g++; }); pc.party_balance.DEM.seats=(office==='S'?34:0)+d; pc.party_balance.GOP.seats=(office==='S'?31:0)+g; pc.num_races_called=d+g; pc.party_balance.DEM.winner = pc.party_balance.DEM.seats>=pc.to_win.DEM; pc.party_balance.GOP.winner = pc.party_balance.GOP.seats>=pc.to_win.GOP; }
   }
 }
+</script>
+<script>
+if(ARCHIVE){ try{ document.querySelector('.live').innerHTML='<i></i>FINAL'; }catch(e){}
+  const w=document.getElementById('welcome'); w.hidden=false; document.getElementById('welcomego').onclick=()=>{ w.hidden=true; }; }   // shown on every load, by request
 </script>
 </body>
 </html>

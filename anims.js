@@ -3088,3 +3088,162 @@ Object.assign(ANIMS, {
 });
 KINDS.push('dominoes','conga','clawmachine','skateboard','barbecue');
 })();
+
+
+/* ===== Texas special ===== */
+/* anims-extra/part11.js — talafreako: the Texas Senate special (≈22 s, multi-act).
+   Triggered by index.html when the Texas Senate race is called for the Democrat; not part of the random deck.
+   Self-contained: every helper used here is defined in this file. */
+(function(){
+const ease = u => u<=0? 0 : u>=1? 1 : u*u*(3-2*u);
+const easeOut = u => u<=0? 0 : u>=1? 1 : 1-Math.pow(1-u,3);
+const clamp01 = u => u<0? 0 : u>1? 1 : u;
+const stBox = st => { const n=(st.d.match(/-?\d+(\.\d+)?/g)||[]).map(Number); let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; for(let i=0;i+1<n.length;i+=2){ x0=Math.min(x0,n[i]); x1=Math.max(x1,n[i]); y0=Math.min(y0,n[i+1]); y1=Math.max(y1,n[i+1]); } return {x0,y0,w:x1-x0,h:y1-y0,cx:(x0+x1)/2,cy:(y0+y1)/2}; };
+const drawState = (path,box,x,y,sc,rot,fill,lw) => { ctx.save(); ctx.translate(x,y); ctx.rotate(rot||0); ctx.scale(sc,sc); ctx.translate(-box.cx,-box.cy); ctx.fillStyle=fill; ctx.strokeStyle=C.ink; ctx.lineWidth=(lw||6)/sc; ctx.fill(path); ctx.stroke(path); ctx.restore(); };
+const label = (txt,x,y,px,col,align) => { ctx.fillStyle=col||C.ink; ctx.font=`900 ${Math.round(px)}px Archivo, sans-serif`; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(txt,x,y); };
+const star = (x,y,R,rot,fill) => { ctx.save(); ctx.translate(x,y); ctx.rotate(rot||0); ctx.beginPath(); for(let i=0;i<10;i++){ const a=i*Math.PI/5-Math.PI/2, rr_=i%2? R*0.42 : R; ctx.lineTo(Math.cos(a)*rr_, Math.sin(a)*rr_); } ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.strokeStyle=C.ink; ctx.lineWidth=Math.max(3,R*0.05); ctx.stroke(); ctx.restore(); };
+/* cowboy donkey (faces right; origin = centre of body; s = half body length). o: {flip, rot, legs(ph), hat, boots, grin, look, lw, hot} */
+const donkey = (x,y,s,o) => { o=o||{}; ctx.save(); ctx.translate(x,y); if(o.rot) ctx.rotate(o.rot); if(o.flip) ctx.scale(-1,1);
+  const body = o.hot? '#F0562A' : '#2E6FE0'; ctx.fillStyle=body; ctx.strokeStyle=C.ink; ctx.lineWidth=o.lw||Math.max(3,s*0.06);
+  ctx.lineWidth*=1.4; ctx.beginPath(); ctx.moveTo(-s*0.9,-s*0.3); ctx.quadraticCurveTo(-s*1.4,-s*0.1,-s*1.2,s*0.3); ctx.stroke(); ctx.lineWidth/=1.4;
+  for(const [lx,d] of [[-s*0.7,1],[-s*0.3,-1],[s*0.3,1],[s*0.7,-1]]){ const a = o.legs!=null? Math.sin(o.legs+lx/s*3)*0.55*d : 0; ctx.save(); ctx.translate(lx,s*0.4); ctx.rotate(a); ctx.fillStyle=body; roundRect(-s*0.12,0,s*0.24,s*0.6,s*0.08); ctx.fill(); ctx.stroke();
+    if(o.boots){ ctx.fillStyle='#8B4A1F'; roundRect(-s*0.16,s*0.42,s*0.36,s*0.22,s*0.06); ctx.fill(); ctx.stroke(); } ctx.restore(); }
+  ctx.fillStyle=body; roundRect(-s*0.9,-s*0.45,s*1.8,s*0.9,s*0.3); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s*0.8,-s*0.4); ctx.lineTo(s*1.25,-s*0.95); ctx.lineTo(s*1.5,-s*0.8); ctx.lineTo(s*1.05,-s*0.2); ctx.closePath(); ctx.fill(); ctx.stroke();
+  roundRect(s*1.15,-s*1.15,s*0.75,s*0.5,s*0.15); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#FFE34D'; for(const ex of [s*1.2,s*1.45]){ ctx.beginPath(); ctx.moveTo(ex,-s*1.1); ctx.lineTo(ex+s*0.1,-s*1.55); ctx.lineTo(ex+s*0.22,-s*1.1); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  if(o.hat!==false){ ctx.save(); ctx.translate(s*1.5,-s*1.2); if(o.hatTip){ ctx.translate(s*0.5,-s*0.3); ctx.rotate(-0.6); } ctx.fillStyle='#8B4A1F'; roundRect(-s*0.75,-s*0.12,s*1.5,s*0.2,s*0.08); ctx.fill(); ctx.stroke(); roundRect(-s*0.4,-s*0.55,s*0.8,s*0.5,s*0.12); ctx.fill(); ctx.stroke(); ctx.fillStyle='#FFE34D'; ctx.fillRect(-s*0.4,-s*0.2,s*0.8,s*0.08); ctx.restore(); }
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s*1.7,-s*0.98,s*0.12,0,7); ctx.fill(); ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(s*1.73+(o.look||0)*s*0.04,-s*0.97,s*0.055,0,7); ctx.fill();
+  if(o.grin){ ctx.strokeStyle=C.ink; ctx.lineWidth=Math.max(2,s*0.05); ctx.beginPath(); ctx.arc(s*1.68,-s*0.76,s*0.14,0.15,Math.PI-0.15); ctx.stroke(); }
+  if(o.hot){ ctx.fillStyle='#FFE34D'; for(let i=0;i<3;i++){ const fy=-s*(1.2+((o.hot*3+i*0.33)%1)*0.6); ctx.beginPath(); ctx.moveTo(s*1.45+i*s*0.14,fy); ctx.lineTo(s*1.52+i*s*0.14,fy-s*0.25); ctx.lineTo(s*1.59+i*s*0.14,fy); ctx.closePath(); ctx.fill(); } }
+  ctx.restore(); };
+const longhorn = (x,y,s,ph) => { ctx.save(); ctx.translate(x,y); ctx.strokeStyle=C.ink; ctx.lineWidth=Math.max(3,s*0.06);
+  for(const [lx,d] of [[-s*0.8,1],[-s*0.35,-1],[s*0.35,1],[s*0.8,-1]]){ ctx.save(); ctx.translate(lx,s*0.45); ctx.rotate(Math.sin(ph+lx/s*2)*0.5*d); ctx.fillStyle='#B8742A'; roundRect(-s*0.13,0,s*0.26,s*0.7,s*0.08); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  ctx.fillStyle='#B8742A'; roundRect(-s*1.1,-s*0.5,s*2.2,s*1.0,s*0.35); ctx.fill(); ctx.stroke();
+  roundRect(s*0.9,-s*0.95,s*0.9,s*0.7,s*0.2); ctx.fill(); ctx.stroke();
+  // the horns
+  ctx.fillStyle='#fff'; ctx.lineWidth=Math.max(3,s*0.05); for(const d of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*1.25,-s*0.9); ctx.quadraticCurveTo(s*1.25+d*s*0.9,-s*1.4, s*1.25+d*s*1.6,-s*1.55); ctx.quadraticCurveTo(s*1.25+d*s*0.9,-s*1.15, s*1.45,-s*0.85); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s*1.55,-s*0.7,s*0.11,0,7); ctx.fill(); ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(s*1.58,-s*0.7,s*0.05,0,7); ctx.fill();
+  ctx.fillStyle='#F0562A'; roundRect(s*1.5,-s*0.45,s*0.3,s*0.18,s*0.06); ctx.fill(); ctx.stroke(); // nose ring-ish
+  ctx.restore(); };
+const derrick = (x,gy,h,gush,t) => { ctx.strokeStyle=C.ink; ctx.lineWidth=5; ctx.fillStyle='#7A6A55';
+  ctx.beginPath(); ctx.moveTo(x-h*0.28,gy); ctx.lineTo(x-h*0.07,gy-h); ctx.lineTo(x+h*0.07,gy-h); ctx.lineTo(x+h*0.28,gy); ctx.closePath(); ctx.fill(); ctx.stroke();
+  for(let i=1;i<5;i++){ const yy=gy-h*i/5, hw=h*0.28*(1-i/5)+h*0.07*i/5; ctx.beginPath(); ctx.moveTo(x-hw,yy); ctx.lineTo(x+hw,yy); ctx.stroke(); }
+  if(gush>0){ const gh=h*1.4*gush; ctx.fillStyle='#2E6FE0'; roundRect(x-h*0.1,gy-h-gh,h*0.2,gh,h*0.08); ctx.fill(); ctx.stroke();
+    for(let i=0;i<10;i++){ const u=((t*1.6+i*0.1)%1); const bx=x+Math.sin(i*2.3)*h*0.45*u, by=gy-h-gh+ -h*0.2 + u*u*(h+gh)*0.9; ctx.fillStyle='#2E6FE0'; ctx.beginPath(); ctx.arc(bx,by,h*0.035*(1-u*0.5),0,7); ctx.fill(); } } };
+const bluebonnet = (x,y,s,g) => { if(g<=0) return; ctx.save(); ctx.translate(x,y); ctx.scale(g,g); ctx.strokeStyle='#2E8B57'; ctx.lineWidth=Math.max(3,s*0.12); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-s*1.4); ctx.stroke();
+  for(let i=0;i<7;i++){ const yy=-s*0.5-i*s*0.16, w=s*(0.42-i*0.045); ctx.fillStyle= i%2? '#2E6FE0':'#7FAAF6'; ctx.beginPath(); ctx.ellipse(-w*0.5,yy,w*0.55,s*0.13,0,0,7); ctx.ellipse(w*0.5,yy,w*0.55,s*0.13,0,0,7); ctx.fill(); }
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,-s*1.62,s*0.14,0,7); ctx.fill(); ctx.restore(); };
+const tumbleweed = (x,y,R,rot) => { ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.strokeStyle='#8B6A3A'; ctx.lineWidth=4; for(let i=0;i<9;i++){ ctx.beginPath(); ctx.ellipse(0,0,R,R*(0.35+0.07*i),i*0.35,0,7); ctx.stroke(); } ctx.restore(); };
+
+/* ---------- sounds ---------- */
+SFX.txWind = function(){ noise(0, 3.2, 0.1, 600); for(let i=0;i<6;i++) tone(330+Math.sin(i)*40, i*0.5, 0.45, 'triangle', 0.05, 300); };
+SFX.hoofbeats = function(){ for(let i=0;i<14;i++){ noise(i*0.16, 0.05, 0.35, 500); tone(90, i*0.16, 0.08, 'sine', 0.3, 50); } };
+SFX.lassoWhirl = function(){ for(let i=0;i<10;i++) noise(i*0.12, 0.1, 0.18, 2500); };
+SFX.yeehaw = function(){ noise(0, 0.12, 0.7, 1500); tone(392, 0, 0.18, 'sawtooth', 0.22, 523); tone(523, 0.18, 0.12, 'sawtooth', 0.22, 659); tone(659, 0.3, 0.5, 'sawtooth', 0.25, 880); tone(880, 0.75, 0.6, 'square', 0.18, 440); cheer(0.4); };
+SFX.chomp = function(){ noise(0, 0.08, 0.6, 1800); tone(220, 0, 0.1, 'square', 0.3, 80); noise(0.22, 0.08, 0.6, 1800); tone(220, 0.22, 0.1, 'square', 0.3, 80); };
+SFX.growl = function(){ for(let i=0;i<10;i++) tone(60+i*18, i*0.18, 0.3, 'sawtooth', 0.14+i*0.02, 55+i*20); noise(0.8, 1.2, 0.2, 400); };
+SFX.bigStomp = function(){ noise(0, 0.35, 0.9, 250); tone(42, 0, 0.45, 'sine', 0.7, 25); tone(110, 0.02, 0.15, 'square', 0.25, 40); };
+SFX.cowbell = function(){ tone(587, 0, 0.14, 'square', 0.28, 500); tone(845, 0, 0.1, 'square', 0.2, 760); noise(0, 0.03, 0.4, 3500); };
+SFX.twang = function(){ for(const [f,d] of [[196,0],[247,0.08],[294,0.16],[392,0.24]]) tone(f, d, 0.55, 'sawtooth', 0.16, f*0.97); tone(98, 0, 0.6, 'triangle', 0.2, 96); };
+SFX.freakMode = function(){ for(let i=0;i<24;i++){ tone(i%2? 880:660, i*0.125, 0.1, 'square', 0.14); if(i%4===0) noise(i*0.125, 0.08, 0.5, 300); if(i%4===2) noise(i*0.125, 0.05, 0.3, 3000); } tone(110, 0, 3, 'sawtooth', 0.08, 220); };
+SFX.freako = function(){ noise(0, 0.5, 1.0, 1200); tone(65, 0, 0.5, 'square', 0.5, 30); [523,659,784,1047,1319].forEach((f,i)=>tone(f, 0.1+i*0.08, 0.9, 'sawtooth', 0.16)); for(let i=0;i<8;i++) tone(1000+Math.random()*2000, 0.5+i*0.1, 0.1, 'square', 0.08, 300); cheer(0.3); cheer(1.4); };
+SFX.hatTip = function(){ tone(523, 0, 0.3, 'triangle', 0.2, 659); tone(784, 0.3, 0.8, 'triangle', 0.22, 783); };
+
+Object.assign(ANIMS, {
+  /* talafreako — the Texas special. Act 1 lasso (0–5.5 s), Act 2 bigger in Texas (5.5–11), Act 3 FREAK MODE (11–18.5), Act 4 hat tip (18.5–22) */
+  talafreako({W,H,r,hit,banner,shake,spawnConfetti}){
+    const A = {dur:22, struck:false, struckAt:0};
+    const st=STATES.TX, path=new Path2D(st.d), box=stBox(st);
+    const gy=H*0.78;                    // ground line
+    const S=Math.min(H*0.1,110);        // donkey base size
+    const stSc=Math.min(H*0.34/box.h, W*0.26/box.w); const stX=W*0.6, stY=H*0.46;
+    const bonnets=[]; for(let i=0;i<26;i++) bonnets.push({x:W*0.03+Math.random()*W*0.94, y:gy+Math.random()*H*0.12, s:S*0.22+Math.random()*S*0.14, at:6.4+Math.random()*3.2});
+    const crowd=[]; for(let i=0;i<14;i++) crowd.push({x:W*0.04+i*W*0.068, ph:Math.random()*6, s:S*0.42, hot:Math.random()<0.3});
+    const word='TALAFREAKO'; const letterAt=i=>11.6+i*0.34;
+    const flags=[]; const fire=(k)=>{ if(flags[k]) return; flags[k]=true; const fn={
+      wind:()=>SFX.txWind(), hoof:()=>SFX.hoofbeats(), whirl:()=>SFX.lassoWhirl(), yee:()=>{ A.struck=true; A.struckAt=4.5; hit('YEEHAW!','yeehaw'); },
+      chomp:()=>SFX.chomp(), growl:()=>{ SFX.growl(); banner('BIGGER!',2.2); }, stomp:()=>{ hit('STOMP!','bigStomp'); }, stomp2:()=>{ SFX.bigStomp(); shake(); },
+      freak:()=>{ SFX.freakMode(); banner('FREAK MODE',2.4); }, freako:()=>{ hit('TALAFREAKO!','freako'); spawnConfetti(200); }, tip:()=>SFX.hatTip() }[k]; fn&&fn(); };
+    const letterFlags=[];
+    let vibe=0;
+    A.frame = t=>{
+      /* ---- backdrop ---- */
+      const freak = t>=11 && t<18.6; const cool = t>=18.6;
+      const sky = freak? (Math.floor(t*2)%2? '#2E6FE0':'#F0562A') : cool? '#2E6FE0' : '#BBD0F5';
+      ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+      if(freak){ ctx.fillStyle='rgba(255,255,255,0.18)'; for(let i=0;i<12;i++){ const a=i*Math.PI/6+t*0.8; ctx.beginPath(); ctx.moveTo(W/2,H*0.5); ctx.lineTo(W/2+Math.cos(a)*W, H*0.5+Math.sin(a)*W); ctx.lineTo(W/2+Math.cos(a+0.26)*W, H*0.5+Math.sin(a+0.26)*W); ctx.closePath(); ctx.fill(); } }
+      // sun / lone star
+      if(t<5.5){ ctx.fillStyle='#FFE34D'; ctx.beginPath(); ctx.arc(W*0.86,H*0.16,H*0.07,0,7); ctx.fill(); ctx.strokeStyle=C.ink; ctx.lineWidth=5; ctx.stroke(); }
+      else { const g=easeOut((t-5.5)/1.2); star(W*0.5,H*0.42,Math.min(W,H)*0.36*g*(freak? 1+0.06*Math.sin(t*6):1), t*0.6, freak? '#FFE34D':'#FFE34D'); }
+      // ground
+      ctx.fillStyle = cool? '#1E4FB0' : '#E9C27A'; ctx.fillRect(0,gy,W,H-gy); ctx.strokeStyle=C.ink; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke();
+      // derricks
+      const gush = clamp01((t-7.8)/1.2); derrick(W*0.09,gy,H*0.3,gush,t); derrick(W*0.91,gy,H*0.34,gush,t);
+      // bluebonnets
+      for(const b of bonnets) bluebonnet(b.x,b.y,b.s,easeOut((t-b.at)/0.5));
+      fire('wind');
+      /* ---- the state ---- */
+      let stFill = t<4.5? '#F0562A' : (t<4.9? (Math.floor(t*12)%2? '#FFE34D':'#2E6FE0') : '#2E6FE0');
+      let sx=stX, sy=stY, ssc=stSc, srot=0;
+      if(t>=4.3 && t<4.9){ const k=(t-4.3)/0.6; sx+= -W*0.03*Math.sin(k*Math.PI*3); srot=0.12*Math.sin(k*Math.PI*4); }
+      if(t>=5.5 && t<11){ ssc*=1-0.35*ease((t-5.5)/0.8); sy = stY - H*0.1*ease((t-5.5)/0.8); }
+      if(t>=11 && t<18.6){ ssc*=0.65; sy=stY-H*0.1; }
+      if(cool){ const k=ease((t-18.6)/1.0); ssc = stSc*(0.65+0.55*k)*(1+0.03*Math.sin(t*3)); sx = stX+(W*0.64-stX)*k; sy = (stY-H*0.1)+(H*0.4-(stY-H*0.1))*k;
+        ctx.fillStyle=`rgba(255,227,77,${0.25+0.15*Math.sin(t*3)})`; ctx.beginPath(); ctx.arc(sx,sy,Math.min(W,H)*0.34,0,7); ctx.fill(); }
+      drawState(path,box,sx,sy,ssc,srot,stFill);
+      if(cool && t>19.6) label('TX', sx, sy, H*0.12, '#fff');
+      /* ---- Act 1: ride in + lasso ---- */
+      if(t<5.5){
+        // tumbleweed
+        const twx = W*1.05 - (W*1.3)*clamp01(t/3.2); tumbleweed(twx, gy-H*0.06+Math.abs(Math.sin(t*5))*-H*0.03, H*0.055, -t*4);
+        if(t>0.8){ fire('hoof'); const rx = -W*0.2 + (W*0.5)*easeOut((t-0.8)/2.2); const by = gy-S*1.1 + Math.abs(Math.sin(t*9))*-S*0.12;
+          longhorn(rx, by, S*0.9, t*9); donkey(rx-S*0.1, by-S*1.05, S*0.8, {boots:true, legs:null, grin:t>4.5, look:1});
+          // lasso: whirl 2.8–4.3, fly 4.3–4.5, loop around state after
+          if(t>2.8){ fire('whirl'); const hx=rx+S*0.9, hy=by-S*1.9; ctx.strokeStyle='#8B4A1F'; ctx.lineWidth=7; ctx.lineCap='round';
+            if(t<4.3){ const a=t*14; ctx.beginPath(); ctx.ellipse(hx+Math.cos(a)*S*0.3, hy-S*0.6+Math.sin(a)*S*0.18, S*0.55, S*0.25, a*0.3, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.moveTo(hx,hy); ctx.lineTo(hx+Math.cos(a)*S*0.3, hy-S*0.6+Math.sin(a)*S*0.18); ctx.stroke(); }
+            else { const k=easeOut((t-4.3)/0.2); const lx=hx+(sx-hx)*k, ly=hy+(sy-hy)*k; ctx.beginPath(); ctx.moveTo(hx,hy); ctx.quadraticCurveTo((hx+lx)/2, Math.min(hy,ly)-S*0.6*(1-k), lx, ly); ctx.stroke(); ctx.beginPath(); ctx.ellipse(lx,ly,box.w*ssc*0.6*(0.3+0.7*k),box.h*ssc*0.6*(0.3+0.7*k),0,0,7); ctx.stroke(); if(t>=4.5) fire('yee'); } }
+        }
+        if(t<2.6) label("Deep in the heart of…", W*0.5, H*0.12, H*0.06, '#fff');
+      }
+      /* ---- Act 2: bigger in Texas ---- */
+      let big = 1; let dx=W*0.33, dy=gy-S*1.1; let hot=0;
+      if(t>=5.5 && t<11){
+        const k=t-5.5;
+        if(k<1.3){ // pepper floats to the mouth
+          const px=dx+S*1.9, py=dy-S*1.1-S*1.6*(1-ease(k/1.0)); ctx.save(); ctx.translate(px,py); ctx.rotate(-0.6); ctx.fillStyle='#F0562A'; ctx.strokeStyle=C.ink; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(0,-S*0.4); ctx.quadraticCurveTo(S*0.5,-S*0.1,S*0.1,S*0.6); ctx.quadraticCurveTo(-S*0.3,S*0.2,0,-S*0.4); ctx.fill(); ctx.stroke(); ctx.fillStyle='#2E8B57'; roundRect(-S*0.08,-S*0.55,S*0.16,S*0.2,S*0.05); ctx.fill(); ctx.stroke(); ctx.restore();
+          if(k>1.0) fire('chomp'); }
+        if(k>=1.3){ fire('growl'); hot = t; big = 1+1.5*ease((k-1.3)/2.2); }
+        if(k>=3.9){ fire('stomp'); } if(k>=4.7){ fire('stomp2'); }
+        const stompPh = k>=3.4? Math.sin((k-3.4)*7) : 0;
+        dx = W*0.3; dy = gy - S*1.1*big + (stompPh>0? -S*0.25*stompPh : 0);
+        donkey(dx, dy, S*0.8*big, {boots:true, hot, grin:true, legs: k>=3.4? (k-3.4)*7 : null, look:1});
+        if(k<1.3) label("Everything's bigger in Texas", W*0.5, H*0.12, H*0.055, '#fff');
+      }
+      /* ---- Act 3: FREAK MODE ---- */
+      if(t>=11 && t<18.6){
+        fire('freak'); const k=t-11;
+        // crowd line dance
+        for(const c of crowd){ const bounce=Math.abs(Math.sin(t*6+c.ph))*S*0.3; const flip = Math.floor((t+c.ph)*1.5)%2===0; donkey(c.x, gy-c.s*1.1-bounce, c.s, {boots:true, hot: c.hot? t:0, grin:true, flip, legs:t*8+c.ph}); }
+        // the big one dances
+        const bx=W*0.3+Math.sin(t*2.2)*W*0.06, by=gy-S*1.1*2.5 - Math.abs(Math.sin(t*6))*S*0.5;
+        donkey(bx, by, S*0.8*2.5, {boots:true, hot:t, grin:true, rot:Math.sin(t*6)*0.12, legs:t*7, look:Math.sin(t*5)});
+        // letters slam in
+        const px=Math.min(H*0.17, W*0.085); ctx.font=`900 ${Math.round(px)}px Archivo, sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        const total = ctx.measureText(word).width; let cx = W/2 - total/2;
+        for(let i=0;i<word.length;i++){ const ch=word[i]; const cw=ctx.measureText(ch).width; const at=letterAt(i); if(t>=at){ if(!letterFlags[i]){ letterFlags[i]=true; SFX.cowbell(); if(i%3===2) SFX.twang(); shake(); }
+            const u=easeOut((t-at)/0.25); const sc=3-2*u; const jx=(1-u)*(Math.random()-.5)*20; ctx.save(); ctx.translate(cx+cw/2+jx, H*0.14+Math.sin(t*8+i)*8); ctx.scale(sc,sc); ctx.fillStyle='#FFE34D'; ctx.strokeStyle=C.ink; ctx.lineWidth=10/sc; ctx.strokeText(ch,0,0); ctx.fillText(ch,0,0); ctx.restore(); }
+          cx+=cw; }
+        if(k>=5.2) fire('freako');
+        if(k>=5.2 && Math.random()<0.6) spawnConfetti(3);
+      }
+      /* ---- Act 4: cool-down, hat tip ---- */
+      if(cool){ fire('tip'); const k=t-18.6; for(const c of crowd){ donkey(c.x, gy-c.s*1.1, c.s, {boots:true, grin:true, flip:false, hatTip:k>0.6}); }
+        const bx=W*0.26, by=gy-S*1.1*2.6; donkey(bx, by, S*0.8*2.6, {boots:true, grin:true, look:0, hatTip:k>0.4});
+        label("Thank y'all kindly", W*0.5, H*0.13, H*0.07, '#FFE34D'); }
+    };
+    return A;
+  }
+});
+ANIMS.talafreako.special = true;
+})();
